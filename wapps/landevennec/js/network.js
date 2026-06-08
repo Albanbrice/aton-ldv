@@ -30,6 +30,12 @@ const Network = (() => {
             XRModule.setTeleportEnabled(d.enabled);
         });
 
+        // Autorisation / révocation du contrôle local des calques
+        ATON.Photon.on("LAYERS_UNLOCK", (d) => {
+            if (d?.enabled === undefined) return;
+            UI.setLayerControlEnabled(d.enabled);
+        });
+
         // Navigation vers la vue courante du médiateur (position + cible exactes)
         ATON.Photon.on("GOTO_POV_RAW", (d) => {
             if (!d?.pos || !d?.target) return;

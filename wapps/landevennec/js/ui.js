@@ -6,6 +6,7 @@ const UI = (() => {
         _initLoadingEvents();
         _initCollabEvents();
         _initControls();
+        _buildLocalLayerPanel();
     }
 
     function _initLoadingEvents() {
@@ -52,6 +53,66 @@ const UI = (() => {
         });
     }
 
+    // ── Panneau calques local visiteur ───────────────────────────────────────
+
+    function _buildLocalLayerPanel() {
+        const list = document.getElementById("local-layers-list");
+        if (!list) return;
+        LAYERS.forEach((layer) => {
+            const row = document.createElement("div");
+            row.className = "local-layer-row";
+
+            const lbl = document.createElement("span");
+            lbl.className = "local-layer-label";
+            lbl.textContent = layer.label;
+
+            const btn = document.createElement("button");
+            btn.className = "local-layer-toggle";
+            btn.dataset.node = layer.node;
+            // État initial depuis config ; sera resynchronisé à l'ouverture du panneau
+            const initialVis = layer.visible === true;
+            btn.textContent = initialVis ? "ON" : "OFF";
+            btn.dataset.visible = String(initialVis);
+            btn.classList.toggle("active", initialVis);
+
+            btn.addEventListener("click", () => {
+                const vis = btn.dataset.visible !== "true";
+                btn.dataset.visible = String(vis);
+                btn.textContent = vis ? "ON" : "OFF";
+                btn.classList.toggle("active", vis);
+                const n = ATON.getSceneNode?.(layer.node);
+                if (n) vis ? n.show() : n.hide();
+            });
+
+            row.appendChild(lbl);
+            row.appendChild(btn);
+            list.appendChild(row);
+        });
+    }
+
+    // Synchronise les toggles locaux sur la visibilité réelle des nœuds
+    // (le médiateur peut avoir modifié les calques depuis le chargement de la scène)
+    function _syncLocalLayerToggles() {
+        LAYERS.forEach((layer) => {
+            const n = ATON.getSceneNode?.(layer.node);
+            if (!n) return;
+            const btn = document.querySelector(`#local-layers-list [data-node="${layer.node}"]`);
+            if (!btn) return;
+            const vis = n.visible;
+            btn.dataset.visible = String(vis);
+            btn.textContent = vis ? "ON" : "OFF";
+            btn.classList.toggle("active", vis);
+        });
+    }
+
+    function setLayerControlEnabled(enabled) {
+        const panel = document.getElementById("local-layers-panel");
+        if (!panel) return;
+        if (enabled) _syncLocalLayerToggles();
+        panel.classList.toggle("visible", enabled);
+        toast(enabled ? "Exploration des calques activée" : "Exploration des calques désactivée");
+    }
+
     // ── API publique ──────────────────────────────────────────────────────────
 
     function showPanel(title, html) {
@@ -76,5 +137,5 @@ const UI = (() => {
         setTimeout(() => el.classList.remove("show"), dur);
     }
 
-    return { init, showPanel, hidePanel, toast };
+    return { init, showPanel, hidePanel, toast, setLayerControlEnabled };
 })();

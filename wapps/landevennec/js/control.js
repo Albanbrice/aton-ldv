@@ -57,6 +57,7 @@ function _buildUI() {
   _buildPOVButtons();
   _buildLayerToggles();
   _buildNavToggle();
+  _buildLayersUnlockToggle();
   _buildMessageInput();
 }
 
@@ -132,6 +133,34 @@ function _buildNavToggle() {
     }
     _flash(btn);
   });
+}
+
+function _buildLayersUnlockToggle() {
+  const btn = document.getElementById("btn-layers-unlock");
+  if (!btn) return;
+
+  // Synchronisation si un autre médiateur change l'état
+  ATON.Photon.on("LAYERS_UNLOCK", (d) => {
+    if (d?.enabled === undefined) return;
+    _syncLayersUnlock(d.enabled);
+  });
+
+  let _enabled = false;
+  btn.addEventListener("click", () => {
+    _enabled = !_enabled;
+    ATON.Photon.fire("LAYERS_UNLOCK", { enabled: _enabled });
+    _syncLayersUnlock(_enabled);
+    _flash(btn);
+  });
+}
+
+function _syncLayersUnlock(enabled) {
+  const btn = document.getElementById("btn-layers-unlock");
+  if (!btn) return;
+  btn.textContent = enabled
+    ? "🔓 Exploration calques — activée"
+    : "🔒 Exploration calques — désactivée";
+  btn.classList.toggle("unlocked", enabled);
 }
 
 function _buildMessageInput() {

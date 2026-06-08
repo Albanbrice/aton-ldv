@@ -135,23 +135,25 @@
     }
 
     .layer-toggle {
-      width: 80px;
+      width: 38px;
       height: 38px;
-      border-radius: 20px;
+      flex-shrink: 0;
+      border-radius: 9px;
       border: 1px solid rgba(255,255,255,0.15);
-      background: rgba(255,255,255,0.06);
-      color: rgba(255,255,255,0.5);
-      font-size: 12px;
-      font-weight: 600;
+      background-color: rgba(255,255,255,0.06);
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 18px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24'/%3E%3Cline x1='1' y1='1' x2='23' y2='23'/%3E%3C/svg%3E");
       cursor: pointer;
-      transition: background 0.2s, color 0.2s, border-color 0.2s;
-      letter-spacing: 0.05em;
+      transition: background-color 0.2s, border-color 0.2s;
+      font-size: 0;
     }
 
     .layer-toggle.active {
-      background: rgba(74,222,128,0.2);
+      background-color: rgba(74,222,128,0.2);
       border-color: rgba(74,222,128,0.4);
-      color: #4ade80;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234ade80' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E");
     }
 
     /* ── Navigation visiteurs ── */
@@ -175,6 +177,28 @@
       color: #4ade80;
     }
     #btn-nav-toggle.free:hover { background: rgba(74,222,128,0.25); }
+
+    /* ── Calques visiteurs ── */
+    #btn-layers-unlock {
+      width: 100%;
+      height: 52px;
+      border-radius: 14px;
+      border: 1px solid rgba(167,139,250,0.35);
+      background: rgba(167,139,250,0.1);
+      color: #a78bfa;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+      letter-spacing: 0.03em;
+    }
+    #btn-layers-unlock:hover { background: rgba(167,139,250,0.2); }
+    #btn-layers-unlock.unlocked {
+      border-color: rgba(74,222,128,0.4);
+      background: rgba(74,222,128,0.15);
+      color: #4ade80;
+    }
+    #btn-layers-unlock.unlocked:hover { background: rgba(74,222,128,0.25); }
 
     /* ── Message ── */
     #msg-row {
@@ -285,6 +309,12 @@
     <section id="section-nav-ctrl">
       <h2>Navigation visiteurs</h2>
       <button id="btn-nav-toggle">🔒 Visite guidée — téléportation bloquée</button>
+    </section>
+
+    <!-- Calques visiteurs ───────────────────────────────────────────────── -->
+    <section id="section-layers-ctrl">
+      <h2>Calques visiteurs</h2>
+      <button id="btn-layers-unlock">🔒 Exploration calques — désactivée</button>
     </section>
 
     <!-- Message ──────────────────────────────────────────────────────────── -->
