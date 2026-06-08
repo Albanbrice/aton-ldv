@@ -29,6 +29,17 @@ const Network = (() => {
             if (d?.enabled === undefined) return;
             XRModule.setTeleportEnabled(d.enabled);
         });
+
+        // Navigation vers la vue courante du médiateur (position + cible exactes)
+        ATON.Photon.on("GOTO_POV_RAW", (d) => {
+            if (!d?.pos || !d?.target) return;
+            const pov = new ATON.POV()
+                .setPosition(d.pos[0],    d.pos[1],    d.pos[2])
+                .setTarget(  d.target[0], d.target[1], d.target[2])
+                .setFOV(d.fov || ATON.Nav.STD_FOV);
+            ATON.Nav.requestPOV(pov, 2.0);
+            UI.toast("Vue du médiateur");
+        });
     }
 
     return { init };

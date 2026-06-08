@@ -1,7 +1,6 @@
 "use strict";
 
-const SESSION_ID    = "landevennec";
-const SCENE_DEFAULT = "alban/landevennec";
+// SESSION_ID, SCENE_DEFAULT définis dans js/config.js
 
 let APP = ATON.App.realize();
 

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <title>Landévennec — Médiateur 3D</title>
+  <link rel="stylesheet" href="main.css" />
+  <style>
+    /* ── Bouton d'ouverture du panneau ── */
+    #btn-mediator-toggle {
+      position: fixed;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 36px;
+      height: 64px;
+      background: rgba(58,123,213,0.85);
+      border: none;
+      border-radius: 10px 0 0 10px;
+      cursor: pointer;
+      z-index: 30;
+      color: #fff;
+      font-size: 18px;
+      transition: right 0.3s ease, background 0.2s;
+      pointer-events: all;
+    }
+    #btn-mediator-toggle:hover { background: rgba(74,139,229,0.95); }
+    #btn-mediator-toggle.open  { right: 300px; }
+
+    /* ── Tiroir médiateur ── */
+    #mediator-panel {
+      position: fixed;
+      top: 0;
+      right: -320px;
+      width: 300px;
+      height: 100%;
+      background: rgba(13,13,20,0.97);
+      border-left: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      z-index: 25;
+      transition: right 0.3s ease;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    #mediator-panel.open { right: 0; }
+
+    /* ── En-tête du tiroir ── */
+    #med-header {
+      position: sticky;
+      top: 0;
+      background: rgba(13,13,20,0.98);
+      padding: 14px 16px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 1;
+    }
+    #med-header h1 {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      flex: 1;
+    }
+    .med-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .med-dot-on  { background: #4ade80; box-shadow: 0 0 5px rgba(74,222,128,.6); }
+    .med-dot-off { background: #ef4444; }
+    #med-status-text {
+      font-size: 11px;
+      color: rgba(255,255,255,0.4);
+    }
+    #med-user-count {
+      font-size: 11px;
+      background: rgba(58,123,213,0.25);
+      color: #7aafff;
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+
+    /* ── Sections du tiroir ── */
+    .med-section {
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .med-section-title {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      margin-bottom: 10px;
+    }
+
+    /* ── Grille POV ── */
+    #med-pov-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 7px;
+    }
+    .med-pov-btn {
+      height: 42px;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      background: rgba(58,123,213,0.1);
+      color: #c8d4ff;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      padding: 0 8px;
+      text-align: center;
+    }
+    .med-pov-btn:hover  { background: rgba(58,123,213,0.25); border-color: rgba(90,150,255,.3); }
+    .med-pov-btn:active { transform: scale(0.97); }
+    .med-pov-btn.flash  { background: rgba(58,123,213,0.5); }
+
+    /* ── Calques ── */
+    #med-layers-list { display: flex; flex-direction: column; gap: 8px; }
+    .med-layer-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .med-layer-label { font-size: 13px; color: #c0c0d8; flex: 1; }
+    .med-layer-toggle {
+      width: 72px; height: 34px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.45);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+      letter-spacing: 0.05em;
+    }
+    .med-layer-toggle.active {
+      background: rgba(74,222,128,0.18);
+      border-color: rgba(74,222,128,0.4);
+      color: #4ade80;
+    }
+
+    /* ── Boutons d'action larges ── */
+    .med-action-btn {
+      width: 100%;
+      height: 46px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.05);
+      color: #d0d0e8;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+      letter-spacing: 0.02em;
+    }
+    .med-action-btn:hover { background: rgba(255,255,255,0.1); }
+    .med-action-btn.flash { background: rgba(74,222,128,0.3); color: #4ade80; }
+
+    /* Bouton nav toggle — même style que control.html */
+    #btn-med-nav-toggle {
+      width: 100%;
+      height: 46px;
+      border-radius: 12px;
+      border: 1px solid rgba(251,191,36,0.35);
+      background: rgba(251,191,36,0.1);
+      color: #fbbf24;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+      letter-spacing: 0.02em;
+    }
+    #btn-med-nav-toggle:hover { background: rgba(251,191,36,0.2); }
+    #btn-med-nav-toggle.free {
+      border-color: rgba(74,222,128,0.4);
+      background: rgba(74,222,128,0.12);
+      color: #4ade80;
+    }
+
+    /* ── Message ── */
+    .med-msg-row { display: flex; gap: 8px; }
+    #med-msg-input {
+      flex: 1;
+      height: 40px;
+      padding: 0 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.06);
+      color: #e0e0f0;
+      font-size: 13px;
+      outline: none;
+    }
+    #med-msg-input::placeholder { color: rgba(255,255,255,0.25); }
+    #med-msg-input:focus { border-color: rgba(58,123,213,0.5); }
+    #btn-med-send-msg {
+      height: 40px;
+      padding: 0 16px;
+      border-radius: 10px;
+      border: none;
+      background: #3a7bd5;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+    #btn-med-send-msg:hover  { background: #4a8be5; }
+    #btn-med-send-msg.flash  { background: #4ade80; color: #0a200a; }
+  </style>
+</head>
+<body>
+
+  <!-- Écran de chargement -->
+  <div id="loading-screen">
+    <div class="loader-ring"></div>
+    <p class="loader-text">Chargement de la scène…</p>
+  </div>
+
+  <!-- Overlay UI partagé avec l'app visiteur -->
+  <div id="ui-overlay">
+    <div id="collab-indicator">
+      <div class="collab-dot" id="collab-dot" style="display:none"></div>
+      <span class="collab-text" id="collab-label"></span>
+    </div>
+    <div id="info-panel">
+      <button id="info-panel-close" title="Fermer">✕</button>
+      <h3 id="info-panel-title"></h3>
+      <div id="info-panel-content"></div>
+    </div>
+    <div id="controls-bar">
+      <button class="ctrl-btn" id="btn-enter-vr" title="Entrer en mode VR">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M2 8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z"/>
+          <circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/>
+        </svg>
+        Entrer en VR
+      </button>
+      <button class="ctrl-btn" id="btn-home" title="Point de vue initial">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        Accueil
+      </button>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+  <div id="idLoader" style="display:none; position:fixed; bottom:16px; right:16px; z-index:200;">
+    <img src="/res/loader.png" style="width:32px; opacity:0.7;" />
+  </div>
+
+  <!-- Bouton d'ouverture du panneau médiateur -->
+  <button id="btn-mediator-toggle" title="Ouvrir le panneau médiateur">🎛</button>
+
+  <!-- Tiroir médiateur ──────────────────────────────────────────────────── -->
+  <div id="mediator-panel">
+
+    <div id="med-header">
+      <div class="med-dot med-dot-off" id="med-status-dot"></div>
+      <h1>Médiateur</h1>
+      <span id="med-status-text">Connexion…</span>
+      <span id="med-user-count" style="display:none"></span>
+    </div>
+
+    <!-- Points de vue -->
+    <div class="med-section">
+      <div class="med-section-title">Points de vue</div>
+      <div id="med-pov-grid"><!-- généré par control3d.js --></div>
+    </div>
+
+    <!-- Calques -->
+    <div class="med-section">
+      <div class="med-section-title">Calques</div>
+      <div id="med-layers-list"><!-- généré par control3d.js --></div>
+    </div>
+
+    <!-- Partager ma vue -->
+    <div class="med-section">
+      <div class="med-section-title">Ma vue</div>
+      <button id="btn-share-pov" class="med-action-btn">📍 Partager ma vue</button>
+    </div>
+
+    <!-- Contrôle navigation -->
+    <div class="med-section">
+      <div class="med-section-title">Navigation visiteurs</div>
+      <button id="btn-med-nav-toggle">🔒 Visite guidée — téléportation bloquée</button>
+    </div>
+
+    <!-- Message -->
+    <div class="med-section">
+      <div class="med-section-title">Message aux visiteurs</div>
+      <div class="med-msg-row">
+        <input id="med-msg-input" type="text" placeholder="Message…" autocomplete="off" />
+        <button id="btn-med-send-msg">→</button>
+      </div>
+    </div>
+
+  </div><!-- /#mediator-panel -->
+
+  <script src="/vendors/vendors.min.js"></script>
+  <script src="/dist/THREE.bundle.js"></script>
+  <script src="/dist/ATON.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/annotations.js"></script>
+  <script src="js/xr.js"></script>
+  <script src="js/control3d.js"></script>
+</body>
+</html>

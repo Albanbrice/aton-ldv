@@ -1,32 +1,6 @@
 "use strict";
 
-const SESSION_ID = "landevennec";
-
-// ── Configuration de la visite ────────────────────────────────────────────────
-// Adaptez ces listes aux IDs de viewpoints et de nœuds définis dans la scène.
-
-// const POVS = [
-//     { id: "vue-generale",   label: "Vue générale"   },
-//     { id: "entree",         label: "Entrée du site" },
-//     { id: "nef",            label: "La nef"         },
-//     { id: "choeur",         label: "Le chœur"       },
-//     { id: "cloitre",        label: "Le cloître"     },
-//     { id: "absides",        label: "Les absides"    },
-// ];
-const POVS = [
-  { id: "aerien", label: "Vue générale" },
-  { id: "remparts", label: "Fortifications" },
-  { id: "chatelet", label: "Pont-levis" },
-  { id: "eglise", label: "Eglise" },
-  { id: "parvis", label: "Parvis" },
-  { id: "cloitre", label: "Cloître" },
-  { id: "chapitre", label: "Salle capitulaire" },
-];
-
-const LAYERS = [
-  { node: "restitution-XIIIe", label: "Restitution XIIIe s." },
-  { node: "archives-photo", label: "Photos d'archives" },
-];
+// SESSION_ID, POVS, LAYERS définis dans js/config.js
 
 // ── App initialization ────────────────────────────────────────────────────────
 
