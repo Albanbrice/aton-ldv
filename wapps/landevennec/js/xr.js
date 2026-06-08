@@ -9,7 +9,8 @@ const XRModule = (() => {
   const SWIPE_ON_PRIMARY = false; // true = main droite (téléportation) ; false = main gauche (joystick / X·Y)
   const AVATAR_CULL_RADIUS = 0.5; // m — avatars trop proches masqués localement
   const ANNO_LABEL_T = 0.5; // 0..1 — position du label entre annotation (0) et œil (1)
-  const ALTITUDE_STEP   = 2; // m par snap vertical (thumbstick Y gauche)
+  const ALTITUDE_STEP   = 2;   // m par snap vertical (thumbstick Y gauche)
+  const FLOOR_OFFSET    = 1.7; // m — hauteur œil au-dessus du terrain (rig.y = hauteur yeux dans ATON)
   // Nœuds terrain par ordre de priorité — le premier visible sert de référence
   const TERRAIN_NODES   = ["etat-actuel", "restitution-XIIIe"];
 
@@ -171,7 +172,7 @@ const XRModule = (() => {
           rig.position.y += ALTITUDE_STEP;
           _stickYArmed = false;
         } else if (ax.y < -0.7) {
-          const localFloor = _getTerrainY();
+          const localFloor = _getTerrainY() + FLOOR_OFFSET;
           _floorY = localFloor; // mise à jour du plancher de référence
           rig.position.y = Math.max(localFloor, rig.position.y - ALTITUDE_STEP);
           _stickYArmed = false;
