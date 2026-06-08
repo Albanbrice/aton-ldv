@@ -6,6 +6,7 @@ const XRModule = (() => {
   const SNAP_ANGLE = 15 * (Math.PI / 180); // radians
   const SNAP_COOLDOWN = 350; // ms — délai minimum entre deux snaps (boutons/swipe)
   const SWIPE_THRESHOLD = 0.012; // m/frame — vitesse minimale pour un swipe intentionnel (≈0.87 m/s à 72fps)
+  const SWIPE_ON_PRIMARY = false; // true = main droite (téléportation) ; false = main gauche (joystick / X·Y)
   const AVATAR_CULL_RADIUS = 0.5; // m — avatars trop proches masqués localement
   const ANNO_LABEL_T = 0.5; // 0..1 — position du label entre annotation (0) et œil (1)
 
@@ -147,7 +148,9 @@ const XRModule = (() => {
     // On utilise ctrl.position.x (espace local WebXR = espace salle) plutôt que
     // userData.pos.x (espace monde) : après un snap, la composante X monde change
     // avec la rotation du rig, rendant le swipe inopérant passé ~90° cumulés.
-    const ctrl = ATON.XR.controller1;
+    const ctrl = SWIPE_ON_PRIMARY
+      ? ATON.XR.getPrimaryController()
+      : ATON.XR.getSecondaryController();
     if (ctrl?.visible) {
       const lx = ctrl.position.x;
       if (_prevLX !== null && !_snapCooldown) {
