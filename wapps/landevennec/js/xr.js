@@ -34,6 +34,15 @@ const XRModule = (() => {
             ATON.Nav.setUserControl(true);
             _prevLX = null;
         });
+
+        // Réinitialise la rotation virtuelle du rig à chaque téléportation.
+        // La téléportation repositionne le rig mais ne touche pas sa rotation —
+        // sans ce reset, les snaps précédents créent un décalage angulaire persistant.
+        ATON.on("XRselectStart", (hand) => {
+            if (hand !== ATON.XR.HAND_R) return;
+            if (!_bTeleportEnabled) return; // téléportation bloquée : pas de reset
+            ATON.XR.rig.rotation.set(0, 0, 0);
+        });
     }
 
     // ── Boucle principale ─────────────────────────────────────────────────────
