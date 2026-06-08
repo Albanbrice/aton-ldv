@@ -21,8 +21,9 @@ const XRModule = (() => {
   let _bResetRotOnTeleport = true;  // false pour le médiateur (évite d'effacer les snaps accumulés)
   let _stickArmed  = true;  // thumbstick prêt à déclencher (reset au neutre)
   let _stickYArmed = true;  // axe Y — armement indépendant de l'axe X
-  let _snapCooldown = false; // verrou partagé boutons + swipe
-  let _prevLX = null; // position X gauche frame précédente (swipe)
+  let _snapCooldown = false; // verrou partagé boutons + swipes
+  let _prevLX = null; // position X gauche frame précédente (swipe horizontal)
+  let _prevLY = null; // position Y gauche frame précédente (swipe vertical)
   let _floorY = 0;   // plancher dynamique — mis à jour au XRstart et à chaque téléport
 
   // Pré-alloués pour le raycast terrain — aucune allocation par appel
@@ -44,6 +45,7 @@ const XRModule = (() => {
       _stickYArmed = true;
       _snapCooldown = false;
       _prevLX = null;
+      _prevLY = null;
     });
 
     ATON.on("XRend", () => {
@@ -124,6 +126,19 @@ const XRModule = (() => {
     ATON.XR.rig.rotateY(dir * SNAP_ANGLE);
   }
 
+  function _snapAltitude(dir) {
+    // dir : +1 = monter, -1 = descendre
+    const rig = ATON.XR.rig;
+    if (dir > 0) {
+      const ceiling = _getTerrainY() + FLOOR_OFFSET + CEILING_HEIGHT;
+      rig.position.y = Math.min(ceiling, rig.position.y + ALTITUDE_STEP);
+    } else {
+      const localFloor = _getTerrainY() + FLOOR_OFFSET;
+      _floorY = localFloor;
+      rig.position.y = Math.max(localFloor, rig.position.y - ALTITUDE_STEP);
+    }
+  }
+
   function _cooldown() {
     _snapCooldown = true;
     setTimeout(() => { _snapCooldown = false; }, SNAP_COOLDOWN);
@@ -170,17 +185,8 @@ const XRModule = (() => {
       if (Math.abs(ax.y) < 0.2) {
         _stickYArmed = true;
       } else if (_stickYArmed) {
-        const rig = ATON.XR.rig;
-        if (ax.y > 0.7) {
-          const ceiling = _getTerrainY() + FLOOR_OFFSET + CEILING_HEIGHT;
-          rig.position.y = Math.min(ceiling, rig.position.y + ALTITUDE_STEP);
-          _stickYArmed = false;
-        } else if (ax.y < -0.7) {
-          const localFloor = _getTerrainY() + FLOOR_OFFSET;
-          _floorY = localFloor; // mise à jour du plancher de référence
-          rig.position.y = Math.max(localFloor, rig.position.y - ALTITUDE_STEP);
-          _stickYArmed = false;
-        }
+        if (ax.y > 0.7)       { _snapAltitude(+1); _stickYArmed = false; }
+        else if (ax.y < -0.7) { _snapAltitude(-1); _stickYArmed = false; }
       }
     }
 
@@ -210,20 +216,26 @@ const XRModule = (() => {
       ? ATON.XR.getPrimaryController()
       : ATON.XR.getSecondaryController();
     if (ctrl?.visible) {
+      // Swipe horizontal — snap rotation
       const lx = ctrl.position.x;
       if (_prevLX !== null && !_snapCooldown) {
-        const delta = lx - _prevLX;
-        if (delta > SWIPE_THRESHOLD) {
-          _snap(-1);
-          _cooldown();
-        } else if (delta < -SWIPE_THRESHOLD) {
-          _snap(+1);
-          _cooldown();
-        }
+        const dx = lx - _prevLX;
+        if (dx > SWIPE_THRESHOLD)       { _snap(-1); _cooldown(); }
+        else if (dx < -SWIPE_THRESHOLD) { _snap(+1); _cooldown(); }
       }
       _prevLX = lx;
+
+      // Swipe vertical — snap altitude (monter la main = monter, descendre = descendre)
+      const ly = ctrl.position.y;
+      if (_prevLY !== null && !_snapCooldown) {
+        const dy = ly - _prevLY;
+        if (dy > SWIPE_THRESHOLD)       { _snapAltitude(+1); _cooldown(); }
+        else if (dy < -SWIPE_THRESHOLD) { _snapAltitude(-1); _cooldown(); }
+      }
+      _prevLY = ly;
     } else {
       _prevLX = null; // tracking perdu → évite un snap fantôme au retour
+      _prevLY = null;
     }
   }
 
