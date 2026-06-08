@@ -11,6 +11,7 @@ const XRModule = (() => {
   const ANNO_LABEL_T = 0.5; // 0..1 — position du label entre annotation (0) et œil (1)
   const ALTITUDE_STEP   = 2;   // m par snap vertical (thumbstick Y gauche)
   const FLOOR_OFFSET    = 1.7; // m — hauteur œil au-dessus du terrain (rig.y = hauteur yeux dans ATON)
+  const CEILING_HEIGHT  = 30;  // m au-dessus du sol — plafond maximal pour éviter de perdre les visiteurs
   // Nœuds terrain par ordre de priorité — le premier visible sert de référence
   const TERRAIN_NODES   = ["etat-actuel", "restitution-XIIIe"];
 
@@ -169,7 +170,8 @@ const XRModule = (() => {
       } else if (_stickYArmed) {
         const rig = ATON.XR.rig;
         if (ax.y > 0.7) {
-          rig.position.y += ALTITUDE_STEP;
+          const ceiling = _getTerrainY() + FLOOR_OFFSET + CEILING_HEIGHT;
+          rig.position.y = Math.min(ceiling, rig.position.y + ALTITUDE_STEP);
           _stickYArmed = false;
         } else if (ax.y < -0.7) {
           const localFloor = _getTerrainY() + FLOOR_OFFSET;
