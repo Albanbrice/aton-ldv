@@ -72,15 +72,22 @@ const XRModule = (() => {
         }
     }
 
-    // ── Correction orientation infoNode ──────────────────────────────────────
-    // SUI.update() appelle infoNode.orientToCamera() qui copie Nav._qOri.
-    // Nav._qOri = cameras[0].quaternion = local au rig, sans la rotation snap.
-    // On premultiplie par la rotation monde du rig pour retrouver l'orientation correcte.
-    // Notre update() s'exécute après SUI.update() et avant le rendu — le timing est bon.
+    // ── Correction orientation et position infoNode ───────────────────────────
+    // SUI.update() place l'infoNode sur le bout de la manette (controller.userData.pos)
+    // quand les controllers sont visibles, ce qui le colle au poignet.
+    // On le replace entre le point d'annotation et l'œil (t=0.3 ≈ 70% vers l'annotation),
+    // puis on corrige le quaternion qui exclut la rotation snap du rig.
 
     function _fixInfoNodeOrientation() {
         const node = ATON.SUI?.infoNode;
         if (!node?.visible) return;
+
+        // Repositionnement — indépendant du controller
+        const sp = ATON._queryDataSem?.p;
+        const ep = ATON.Nav.getCurrentEyeLocation();
+        if (sp && ep) node.position.lerpVectors(sp, ep, 0.3);
+
+        // Correction quaternion (snap rotation non incluse dans Nav._qOri)
         ATON.XR.rig.getWorldQuaternion(_rigQ);
         node.quaternion.premultiply(_rigQ);
     }
