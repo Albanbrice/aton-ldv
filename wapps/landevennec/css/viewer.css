@@ -1,0 +1,283 @@
+/* Styles de l'app 3D/VR (index.html + control3d.html)
+   Dépend de common.css pour le reset, les variables et le toast. */
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden; /* Contexte immersif — pas de scroll */
+  background: var(--bg-dark);
+  font-family: var(--font);
+}
+
+/* ── Canvas Three.js injecté par ATON (#idView3D) ────────────────────────── */
+#idView3D {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 0;
+  outline: none;
+  border: none;
+}
+
+#aton-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Overlay HTML (masqué en mode XR immersif) ───────────────────────────── */
+#ui-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+  transition: opacity 0.4s ease;
+}
+
+#ui-overlay.xr-active {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── Barre de contrôles (bas, centré) ────────────────────────────────────── */
+#controls-bar {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  pointer-events: all;
+  background: rgba(10, 10, 20, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 40px;
+  padding: 10px 20px;
+}
+
+.ctrl-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #e8e8f0;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  letter-spacing: 0.02em;
+}
+
+.ctrl-btn:hover  { background: rgba(255, 255, 255, 0.16); transform: translateY(-1px); }
+.ctrl-btn:active { transform: scale(0.97); }
+.ctrl-btn svg    { flex-shrink: 0; opacity: 0.85; }
+
+#btn-enter-vr {
+  background: linear-gradient(135deg, #3a7bd5, #2d5fa8);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 2px 12px rgba(58, 123, 213, 0.4);
+}
+#btn-enter-vr:hover { background: linear-gradient(135deg, #4a8be5, #3d6fb8); }
+
+/* ── Panneau d'informations (annotations desktop) ────────────────────────── */
+#info-panel {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  width: 300px;
+  max-height: 60vh;
+  overflow-y: auto;
+  background: rgba(10, 10, 20, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 20px;
+  color: #d8d8e8;
+  font-size: 14px;
+  line-height: 1.6;
+  pointer-events: all;
+  opacity: 0;
+  transform: translateX(20px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+#info-panel.visible { opacity: 1; transform: translateX(0); }
+
+#info-panel h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 10px;
+}
+
+#info-panel-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  transition: color 0.2s;
+}
+#info-panel-close:hover { color: #fff; }
+
+/* ── Écran de chargement ─────────────────────────────────────────────────── */
+#loading-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-dark);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  transition: opacity 0.6s ease;
+}
+
+#loading-screen.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loader-ring {
+  width: 48px;
+  height: 48px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--color-blue);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loader-text {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ── Panneau calques local visiteur ──────────────────────────────────────── */
+#local-layers-panel {
+  position: absolute;
+  bottom: 90px;
+  left: 16px;
+  background: rgba(10, 10, 20, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 220px;
+  pointer-events: all;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+#local-layers-panel.visible {
+  display: flex;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.local-layers-title {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  margin-bottom: 2px;
+}
+
+.local-layer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.local-layer-label {
+  font-size: 13px;
+  color: #c8c8e0;
+  flex: 1;
+}
+
+.local-layer-toggle {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background-color: rgba(255, 255, 255, 0.05);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 18px;
+  background-image: var(--eye-closed);
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+  font-size: 0;
+}
+
+.local-layer-toggle.active {
+  background-color: rgba(74, 222, 128, 0.18);
+  border-color: rgba(74, 222, 128, 0.4);
+  background-image: var(--eye-open);
+}
+
+/* ── Indicateur de session collaborative ─────────────────────────────────── */
+#collab-indicator {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.collab-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-green);
+  box-shadow: 0 0 6px rgba(74, 222, 128, 0.6);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.2); opacity: 0.7; }
+}
+
+.collab-text {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+}
+
+/* ── Toast — position spécifique aux pages viewer (au-dessus des contrôles) ─ */
+#toast { bottom: 90px; }

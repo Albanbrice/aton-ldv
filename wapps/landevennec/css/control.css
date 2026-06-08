@@ -1,0 +1,250 @@
+/* Styles de la page médiateur tablette (control.html)
+   Dépend de common.css pour le reset, les variables, le toast et les icônes œil. */
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  font-family: var(--font);
+  background: #0d0d14;
+  color: #e0e0f0;
+  overflow-y: auto;
+}
+
+/* ── En-tête statut ──────────────────────────────────────────────────────── */
+#status-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: rgba(13, 13, 20, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+#status-bar h1 {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #fff;
+  flex: 1;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot-on  { background: var(--color-green); box-shadow: 0 0 6px rgba(74, 222, 128, 0.6); }
+.dot-off { background: #ef4444; box-shadow: 0 0 6px rgba(239, 68, 68, 0.4); }
+
+#status-text { font-size: 13px; color: rgba(255, 255, 255, 0.55); }
+
+#user-count {
+  font-size: 12px;
+  background: rgba(58, 123, 213, 0.25);
+  color: #7aafff;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+/* ── Layout principal ────────────────────────────────────────────────────── */
+main {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+section {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 18px;
+}
+
+section h2 {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 14px;
+}
+
+/* ── Grille des points de vue ────────────────────────────────────────────── */
+#pov-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.pov-btn {
+  height: 52px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  background: rgba(58, 123, 213, 0.12);
+  color: #d0d8ff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s, border-color 0.15s;
+  padding: 0 14px;
+  text-align: center;
+}
+
+.pov-btn:hover  { background: rgba(58, 123, 213, 0.28); border-color: rgba(90, 150, 255, 0.3); }
+.pov-btn:active { transform: scale(0.97); }
+.pov-btn.flash  { background: rgba(58, 123, 213, 0.55); border-color: rgba(120, 180, 255, 0.6); }
+
+/* ── Calques ─────────────────────────────────────────────────────────────── */
+#layers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.layer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.layer-label {
+  font-size: 14px;
+  color: #c8c8e0;
+  flex: 1;
+}
+
+.layer-toggle {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: 9px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background-color: rgba(255, 255, 255, 0.06);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 18px;
+  background-image: var(--eye-closed);
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+  font-size: 0;
+}
+
+.layer-toggle.active {
+  background-color: rgba(74, 222, 128, 0.2);
+  border-color: rgba(74, 222, 128, 0.4);
+  background-image: var(--eye-open);
+}
+
+/* ── Navigation visiteurs ────────────────────────────────────────────────── */
+#btn-nav-toggle {
+  width: 100%;
+  height: 52px;
+  border-radius: 14px;
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  background: rgba(251, 191, 36, 0.12);
+  color: var(--color-yellow);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  letter-spacing: 0.03em;
+}
+#btn-nav-toggle:hover { background: rgba(251, 191, 36, 0.22); }
+#btn-nav-toggle.free {
+  border-color: rgba(74, 222, 128, 0.4);
+  background: rgba(74, 222, 128, 0.15);
+  color: var(--color-green);
+}
+#btn-nav-toggle.free:hover { background: rgba(74, 222, 128, 0.25); }
+
+/* ── Calques visiteurs ───────────────────────────────────────────────────── */
+#btn-layers-unlock {
+  width: 100%;
+  height: 52px;
+  border-radius: 14px;
+  border: 1px solid rgba(167, 139, 250, 0.35);
+  background: rgba(167, 139, 250, 0.1);
+  color: var(--color-purple);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  letter-spacing: 0.03em;
+}
+#btn-layers-unlock:hover { background: rgba(167, 139, 250, 0.2); }
+#btn-layers-unlock.unlocked {
+  border-color: rgba(74, 222, 128, 0.4);
+  background: rgba(74, 222, 128, 0.15);
+  color: var(--color-green);
+}
+#btn-layers-unlock.unlocked:hover { background: rgba(74, 222, 128, 0.25); }
+
+/* ── Message aux visiteurs ───────────────────────────────────────────────── */
+#msg-row { display: flex; gap: 10px; }
+
+#msg-input {
+  flex: 1;
+  height: 46px;
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.07);
+  color: #e0e0f0;
+  font-size: 14px;
+  outline: none;
+}
+#msg-input::placeholder { color: rgba(255, 255, 255, 0.3); }
+#msg-input:focus { border-color: rgba(58, 123, 213, 0.5); }
+
+#btn-send-msg {
+  height: 46px;
+  padding: 0 22px;
+  border-radius: 12px;
+  border: none;
+  background: var(--color-blue);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+#btn-send-msg:hover  { background: #4a8be5; }
+#btn-send-msg:active { background: #2d68b8; }
+#btn-send-msg.flash  { background: var(--color-green); color: #0a200a; }
+
+/* ── Lien visiteurs ──────────────────────────────────────────────────────── */
+#section-link p {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 10px;
+}
+
+#visitor-url {
+  display: block;
+  font-family: monospace;
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: #7aafff;
+  word-break: break-all;
+  user-select: all;
+  cursor: text;
+}
+
+/* ── Toast — position spécifique (page scrollable, pas de contrôles en bas) ─ */
+#toast { bottom: 24px; }
