@@ -16,6 +16,8 @@ const XRModule = (() => {
     let _snapCooldown     = false; // verrou partagé boutons + swipe
     let _prevLX           = null;  // position X gauche frame précédente (swipe)
 
+    const _rigQ = new THREE.Quaternion(); // réutilisable — évite l'allocation par frame
+
     // ── Init ──────────────────────────────────────────────────────────────────
 
     function init() {
@@ -51,6 +53,7 @@ const XRModule = (() => {
         _updateAvatarCulling(); // actif en VR et en vue 3D standard
         if (!ATON.XR.isPresenting()) return;
         _updateSnap();
+        _fixInfoNodeOrientation();
     }
 
     // ── Masquage local des avatars trop proches ───────────────────────────────
@@ -67,6 +70,19 @@ const XRModule = (() => {
             if (!A || uid === myUID) continue;
             A.visible = myPos.distanceTo(A.position) > AVATAR_CULL_RADIUS;
         }
+    }
+
+    // ── Correction orientation infoNode ──────────────────────────────────────
+    // SUI.update() appelle infoNode.orientToCamera() qui copie Nav._qOri.
+    // Nav._qOri = cameras[0].quaternion = local au rig, sans la rotation snap.
+    // On premultiplie par la rotation monde du rig pour retrouver l'orientation correcte.
+    // Notre update() s'exécute après SUI.update() et avant le rendu — le timing est bon.
+
+    function _fixInfoNodeOrientation() {
+        const node = ATON.SUI?.infoNode;
+        if (!node?.visible) return;
+        ATON.XR.rig.getWorldQuaternion(_rigQ);
+        node.quaternion.premultiply(_rigQ);
     }
 
     // ── Snap rotation ─────────────────────────────────────────────────────────

@@ -85,7 +85,8 @@ const Annotations = (() => {
         panel.position.lerpVectors(sp, ep, 0.3);
         panel.position.x += 0.15;
         panel.setScale(0.4); // ≈ 0.4 m de large
-        panel.orientToCamera();
+        // lookAt bypasse Nav._qOri (qui exclut la rotation du rig après snap)
+        panel.lookAt(ep);
     }
 
     return { init };
