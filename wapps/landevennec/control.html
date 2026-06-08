@@ -154,6 +154,28 @@
       color: #4ade80;
     }
 
+    /* ── Navigation visiteurs ── */
+    #btn-nav-toggle {
+      width: 100%;
+      height: 52px;
+      border-radius: 14px;
+      border: 1px solid rgba(251,191,36,0.35);
+      background: rgba(251,191,36,0.12);
+      color: #fbbf24;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+      letter-spacing: 0.03em;
+    }
+    #btn-nav-toggle:hover { background: rgba(251,191,36,0.22); }
+    #btn-nav-toggle.free {
+      border-color: rgba(74,222,128,0.4);
+      background: rgba(74,222,128,0.15);
+      color: #4ade80;
+    }
+    #btn-nav-toggle.free:hover { background: rgba(74,222,128,0.25); }
+
     /* ── Message ── */
     #msg-row {
       display: flex;
@@ -257,6 +279,12 @@
       <div id="layers-list">
         <!-- généré par control.js -->
       </div>
+    </section>
+
+    <!-- Navigation visiteurs ────────────────────────────────────────────── -->
+    <section id="section-nav-ctrl">
+      <h2>Navigation visiteurs</h2>
+      <button id="btn-nav-toggle">🔒 Visite guidée — téléportation bloquée</button>
     </section>
 
     <!-- Message ──────────────────────────────────────────────────────────── -->

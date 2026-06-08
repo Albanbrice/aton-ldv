@@ -82,6 +82,7 @@ function _updateUsers() {
 function _buildUI() {
   _buildPOVButtons();
   _buildLayerToggles();
+  _buildNavToggle();
   _buildMessageInput();
 }
 
@@ -131,6 +132,29 @@ function _buildLayerToggles() {
     row.appendChild(lbl);
     row.appendChild(toggle);
     list.appendChild(row);
+  });
+}
+
+function _buildNavToggle() {
+  const btn = document.getElementById("btn-nav-toggle");
+  if (!btn) return;
+
+  let _freeNav = false;
+
+  btn.addEventListener("click", () => {
+    _freeNav = !_freeNav;
+    ATON.Photon.fire("NAV_TOGGLE", { enabled: _freeNav });
+
+    if (_freeNav) {
+      btn.textContent = "🔓 Visite libre — téléportation active";
+      btn.classList.add("free");
+      _toast("Navigation libre activée");
+    } else {
+      btn.textContent = "🔒 Visite guidée — téléportation bloquée";
+      btn.classList.remove("free");
+      _toast("Navigation guidée");
+    }
+    _flash(btn);
   });
 }
 
