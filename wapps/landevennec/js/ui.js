@@ -56,38 +56,14 @@ const UI = (() => {
     // ── Panneau calques local visiteur ───────────────────────────────────────
 
     function _buildLocalLayerPanel() {
-        const list = document.getElementById("local-layers-list");
-        if (!list) return;
-        LAYERS.forEach((layer) => {
-            const row = document.createElement("div");
-            row.className = "local-layer-row";
-
-            const lbl = document.createElement("span");
-            lbl.className = "local-layer-label";
-            lbl.textContent = layer.label;
-
-            const btn = document.createElement("button");
-            btn.className = "local-layer-toggle";
-            btn.dataset.node = layer.node;
-            // État initial depuis config ; sera resynchronisé à l'ouverture du panneau
-            const initialVis = layer.visible === true;
-            btn.textContent = initialVis ? "ON" : "OFF";
-            btn.dataset.visible = String(initialVis);
-            btn.classList.toggle("active", initialVis);
-
-            btn.addEventListener("click", () => {
-                const vis = btn.dataset.visible !== "true";
-                btn.dataset.visible = String(vis);
-                btn.textContent = vis ? "ON" : "OFF";
-                btn.classList.toggle("active", vis);
+        buildLayerRows(
+            "local-layers-list",
+            { row: "local-layer-row", label: "local-layer-label", toggle: "local-layer-toggle" },
+            (layer, _btn, vis) => {
                 const n = ATON.getSceneNode?.(layer.node);
                 if (n) vis ? n.show() : n.hide();
-            });
-
-            row.appendChild(lbl);
-            row.appendChild(btn);
-            list.appendChild(row);
-        });
+            }
+        );
     }
 
     // Synchronise les toggles locaux sur la visibilité réelle des nœuds

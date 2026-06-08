@@ -71,7 +71,7 @@ function _buildPOVButtons() {
     btn.textContent = pov.label;
     btn.addEventListener("click", () => {
       ATON.Photon.fire("GOTO_POV", { id: pov.id });
-      _flash(btn);
+      flash(btn);
       _toast("Vue envoyée : " + pov.label);
     });
     grid.appendChild(btn);
@@ -79,37 +79,14 @@ function _buildPOVButtons() {
 }
 
 function _buildLayerToggles() {
-  const list = document.getElementById("layers-list");
-  if (!list) return;
-
-  LAYERS.forEach((layer) => {
-    const row = document.createElement("div");
-    row.className = "layer-row";
-
-    const lbl = document.createElement("span");
-    lbl.className = "layer-label";
-    lbl.textContent = layer.label;
-
-    const toggle = document.createElement("button");
-    toggle.className = "layer-toggle";
-    const initialVis = layer.visible === true;
-    toggle.textContent = initialVis ? "ON" : "OFF";
-    toggle.dataset.visible = String(initialVis);
-    toggle.classList.toggle("active", initialVis);
-
-    toggle.addEventListener("click", () => {
-      const vis = toggle.dataset.visible !== "true";
-      toggle.dataset.visible = String(vis);
-      toggle.textContent = vis ? "ON" : "OFF";
-      toggle.classList.toggle("active", vis);
+  buildLayerRows(
+    "layers-list",
+    { row: "layer-row", label: "layer-label", toggle: "layer-toggle" },
+    (layer, btn, vis) => {
       ATON.Photon.fire("LAYER_SET", { node: layer.node, visible: vis });
       _toast((vis ? "Calque activé : " : "Calque masqué : ") + layer.label);
-    });
-
-    row.appendChild(lbl);
-    row.appendChild(toggle);
-    list.appendChild(row);
-  });
+    }
+  );
 }
 
 function _buildNavToggle() {
@@ -131,7 +108,7 @@ function _buildNavToggle() {
       btn.classList.remove("free");
       _toast("Navigation guidée");
     }
-    _flash(btn);
+    flash(btn);
   });
 }
 
@@ -150,7 +127,7 @@ function _buildLayersUnlockToggle() {
     _enabled = !_enabled;
     ATON.Photon.fire("LAYERS_UNLOCK", { enabled: _enabled });
     _syncLayersUnlock(_enabled);
-    _flash(btn);
+    flash(btn);
   });
 }
 
@@ -173,7 +150,7 @@ function _buildMessageInput() {
     if (!text) return;
     ATON.Photon.fire("BROADCAST", { text });
     input.value = "";
-    _flash(btn);
+    flash(btn);
     _toast("Message envoyé");
   };
 
@@ -193,11 +170,6 @@ function _showVisitorLink() {
 }
 
 // ── Utilitaires UI ────────────────────────────────────────────────────────────
-
-function _flash(el) {
-  el.classList.add("flash");
-  setTimeout(() => el.classList.remove("flash"), 600);
-}
 
 function _toast(msg, dur = 2000) {
   const el = document.getElementById("toast");

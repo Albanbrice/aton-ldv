@@ -105,7 +105,7 @@ function _buildPOVButtons() {
         btn.addEventListener("click", () => {
             ATON.Photon.fire("GOTO_POV", { id: pov.id });
             ATON.Nav.requestPOVbyID(pov.id, 2.0); // médiateur suit aussi
-            _flash(btn);
+            flash(btn);
             UI.toast("Vue : " + pov.label);
         });
         grid.appendChild(btn);
@@ -113,48 +113,26 @@ function _buildPOVButtons() {
 }
 
 function _buildLayerToggles() {
-    const list = document.getElementById("med-layers-list");
-    if (!list) return;
-    LAYERS.forEach((layer) => {
-        const row    = document.createElement("div");
-        row.className = "med-layer-row";
-
-        const lbl    = document.createElement("span");
-        lbl.className = "med-layer-label";
-        lbl.textContent = layer.label;
-
-        const toggle = document.createElement("button");
-        toggle.className        = "med-layer-toggle";
-        toggle.dataset.node     = layer.node;
-        const initialVis        = layer.visible === true;
-        toggle.textContent      = initialVis ? "ON" : "OFF";
-        toggle.dataset.visible  = String(initialVis);
-        toggle.classList.toggle("active", initialVis);
-
-        toggle.addEventListener("click", () => {
-            const vis = toggle.dataset.visible !== "true";
-            _applyLayerToggle(toggle, vis);
+    buildLayerRows(
+        "med-layers-list",
+        { row: "med-layer-row", label: "med-layer-label", toggle: "med-layer-toggle" },
+        (layer, btn, vis) => {
+            const n = ATON.getSceneNode(layer.node);
+            if (n) vis ? n.show() : n.hide();
             ATON.Photon.fire("LAYER_SET", { node: layer.node, visible: vis });
             UI.toast((vis ? "Calque activé : " : "Calque masqué : ") + layer.label);
-        });
-
-        row.appendChild(lbl);
-        row.appendChild(toggle);
-        list.appendChild(row);
-    });
-}
-
-function _applyLayerToggle(btn, visible) {
-    btn.dataset.visible = String(visible);
-    btn.textContent     = visible ? "ON" : "OFF";
-    btn.classList.toggle("active", visible);
-    const n = ATON.getSceneNode(btn.dataset.node);
-    if (n) visible ? n.show() : n.hide();
+        }
+    );
 }
 
 function _syncLayerToggle(nodeId, visible) {
     const btn = document.querySelector(`[data-node="${nodeId}"]`);
-    if (btn) _applyLayerToggle(btn, visible);
+    if (!btn) return;
+    btn.dataset.visible = String(visible);
+    btn.textContent     = visible ? "ON" : "OFF";
+    btn.classList.toggle("active", visible);
+    const n = ATON.getSceneNode(nodeId);
+    if (n) visible ? n.show() : n.hide();
 }
 
 function _buildSharePOV() {
@@ -167,7 +145,7 @@ function _buildSharePOV() {
             target: pov.target.toArray(),
             fov:    pov.fov,
         });
-        _flash(btn);
+        flash(btn);
         UI.toast("Vue partagée avec les visiteurs");
     });
 }
@@ -180,7 +158,7 @@ function _buildNavToggle() {
         _freeNav = !_freeNav;
         ATON.Photon.fire("NAV_TOGGLE", { enabled: _freeNav });
         _syncNavToggle(_freeNav);
-        _flash(btn);
+        flash(btn);
     });
 }
 
@@ -211,7 +189,7 @@ function _buildLayersUnlockToggle() {
         _enabled = !_enabled;
         ATON.Photon.fire("LAYERS_UNLOCK", { enabled: _enabled });
         _syncLayersUnlock(_enabled);
-        _flash(btn);
+        flash(btn);
     });
 }
 
@@ -233,7 +211,7 @@ function _buildMessageInput() {
         if (!text) return;
         ATON.Photon.fire("BROADCAST", { text });
         input.value = "";
-        _flash(btn);
+        flash(btn);
         UI.toast("Message envoyé");
     };
     btn.addEventListener("click", send);
@@ -252,8 +230,3 @@ function _buildPanelToggle() {
 }
 
 // ── Utilitaires ───────────────────────────────────────────────────────────────
-
-function _flash(el) {
-    el.classList.add("flash");
-    setTimeout(() => el.classList.remove("flash"), 600);
-}
