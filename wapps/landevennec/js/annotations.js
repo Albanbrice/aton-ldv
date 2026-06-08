@@ -43,14 +43,36 @@ const Annotations = (() => {
 
     // ── VR ────────────────────────────────────────────────────────────────────
 
+    // infoContainer est un ThreeMeshUI.Block figé à width:0.2 height:0.05 dans le core.
+    // On le redimensionne avant setInfoNodeText() — ThreeMeshUI.update() est appelé
+    // à l'intérieur de setInfoNodeText, ce qui applique les deux changements ensemble.
+    function _resizeInfoContainer(text) {
+        const c = ATON.SUI?.infoContainer;
+        if (!c) return;
+
+        const W             = 0.45;           // plus large que le défaut 0.2
+        const FS            = 0.02;           // fontSize défini dans buildInfoNode
+        const LINE_H        = FS * 1.5;
+        const PAD           = 0.016;
+        const CHARS_PER_LINE = Math.floor((W - PAD * 2) / (FS * 0.55));
+
+        let totalLines = 0;
+        for (const line of text.split("\n"))
+            totalLines += Math.max(1, Math.ceil(line.length / CHARS_PER_LINE));
+
+        const height = Math.max(0.07, totalLines * LINE_H + PAD * 2);
+        c.set({ width: W, height, padding: PAD });
+    }
+
     function _showVR(nid, rawDesc) {
         const plain = _stripHTML(rawDesc);
+        const text  = nid.toUpperCase() + (plain ? "\n" + plain : "");
+
+        // Redimensionner le cartouche avant d'injecter le texte
+        _resizeInfoContainer(text);
 
         // SUI.infoNode : ATON le positionne et l'affiche automatiquement
-        // On surcharge le texte par défaut (= semid) avec le contenu réel.
-        ATON.SUI.setInfoNodeText(
-            nid.toUpperCase() + (plain ? "\n" + plain : "")
-        );
+        ATON.SUI.setInfoNodeText(text);
 
         // Images extraites du HTML de description
         const imgs = _extractImgSrcs(rawDesc);
