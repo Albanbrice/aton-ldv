@@ -7,6 +7,7 @@ const XRModule = (() => {
     const SNAP_ANGLE      = 15 * (Math.PI / 180); // radians
     const SNAP_COOLDOWN   = 350;  // ms — délai minimum entre deux snaps (boutons/swipe)
     const SWIPE_THRESHOLD = 0.05; // m/frame — vitesse minimale pour un swipe intentionnel
+    const AVATAR_CULL_RADIUS = 0.5; // m — avatars trop proches masqués localement
 
     // ── État interne ──────────────────────────────────────────────────────────
 
@@ -38,8 +39,25 @@ const XRModule = (() => {
     // ── Boucle principale ─────────────────────────────────────────────────────
 
     function update() {
+        _updateAvatarCulling(); // actif en VR et en vue 3D standard
         if (!ATON.XR.isPresenting()) return;
         _updateSnap();
+    }
+
+    // ── Masquage local des avatars trop proches ───────────────────────────────
+
+    function _updateAvatarCulling() {
+        const avatars = ATON.Photon?.avatarList;
+        if (!avatars?.length) return;
+
+        const myPos = ATON.Nav.getCurrentEyeLocation();
+        const myUID = ATON.Photon.uid;
+
+        for (let uid = 0; uid < avatars.length; uid++) {
+            const A = avatars[uid];
+            if (!A || uid === myUID) continue;
+            A.visible = myPos.distanceTo(A.position) > AVATAR_CULL_RADIUS;
+        }
     }
 
     // ── Snap rotation ─────────────────────────────────────────────────────────
