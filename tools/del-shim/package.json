@@ -1,0 +1,6 @@
+{
+  "name": "del",
+  "version": "6.99.0",
+  "description": "CJS shim — rend del compatible avec require() pour ATON Core.js",
+  "main": "index.js"
+}

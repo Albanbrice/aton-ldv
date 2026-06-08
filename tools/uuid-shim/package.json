@@ -1,0 +1,6 @@
+{
+  "name": "uuid",
+  "version": "8.99.0",
+  "description": "CJS shim — rend uuid compatible avec require() pour ATON Core.js",
+  "main": "index.js"
+}

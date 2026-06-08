@@ -63,7 +63,7 @@
     "constants-browserify": "^1.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
-    "del": "^8.0.1",
+    "del": "file:./tools/del-shim",
     "dotenv": "^17.4.2",
     "ejs": "^6.0.1",
     "express": "^5.2.1",
@@ -96,7 +96,7 @@
     "three-custom-shader-material": "6.4.0",
     "three-mesh-bvh": "0.9.10",
     "three-mesh-ui": "^6.5.4",
-    "uuid": "^14.0.0",
+    "uuid": "file:./tools/uuid-shim",
     "webdav-server": "^2.6.2",
     "ws": "^8.21.0",
     "zlibjs": "^0.3.1"
