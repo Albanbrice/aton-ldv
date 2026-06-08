@@ -117,7 +117,7 @@ function _buildLayerToggles() {
     buildLayerRows(
         "med-layers-list",
         { row: "med-layer-row", label: "med-layer-label", toggle: "med-layer-toggle" },
-        (layer, btn, vis) => {
+        (layer, _btn, vis) => {
             const n = ATON.getSceneNode(layer.node);
             if (n) vis ? n.show() : n.hide();
             ATON.Photon.fire("LAYER_SET", { node: layer.node, visible: vis });
