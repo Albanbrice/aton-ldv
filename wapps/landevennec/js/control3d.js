@@ -124,9 +124,11 @@ function _buildLayerToggles() {
 
         const toggle = document.createElement("button");
         toggle.className        = "med-layer-toggle";
-        toggle.textContent      = "OFF";
         toggle.dataset.node     = layer.node;
-        toggle.dataset.visible  = "false";
+        const initialVis        = layer.visible === true;
+        toggle.textContent      = initialVis ? "ON" : "OFF";
+        toggle.dataset.visible  = String(initialVis);
+        toggle.classList.toggle("active", initialVis);
 
         toggle.addEventListener("click", () => {
             const vis = toggle.dataset.visible !== "true";

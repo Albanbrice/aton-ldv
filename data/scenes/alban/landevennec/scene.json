@@ -6,6 +6,9 @@
   "scenegraph": {
     "nodes": {
       "main": {
+        "urls": []
+      },
+      "etat-actuel": {
         "urls": [
           "https://tiles.archeo3d.org/landevennec/tileset_2026-06_Abbaye.json"
         ],
@@ -20,7 +23,7 @@
       },
       "archives-photo": { "urls": [], "show": false }
     },
-    "edges": { ".": ["main", "restitution-XIIIe"] }
+    "edges": { ".": ["etat-actuel", "restitution-XIIIe"] }
   },
   "viewpoints": {
     "home": {
