@@ -9,18 +9,24 @@ const XRModule = (() => {
   const SWIPE_ON_PRIMARY = false; // true = main droite (téléportation) ; false = main gauche (joystick / X·Y)
   const AVATAR_CULL_RADIUS = 0.5; // m — avatars trop proches masqués localement
   const ANNO_LABEL_T = 0.5; // 0..1 — position du label entre annotation (0) et œil (1)
-  const ALTITUDE_STEP = 0.5; // m par snap vertical (thumbstick Y gauche)
-  const FLOOR_Y = 0; // hauteur minimale du rig — empêche de passer sous le sol physique
+  const ALTITUDE_STEP   = 2; // m par snap vertical (thumbstick Y gauche)
+  // Nœuds terrain par ordre de priorité — le premier visible sert de référence
+  const TERRAIN_NODES   = ["etat-actuel", "restitution-XIIIe"];
 
   // ── État interne ──────────────────────────────────────────────────────────
 
   let _bTeleportEnabled = false; // guidée par défaut
-  let _stickArmed = true; // thumbstick prêt à déclencher (reset au neutre)
-  let _stickYArmed = true; // axe Y — armement indépendant de l'axe X
+  let _stickArmed  = true;  // thumbstick prêt à déclencher (reset au neutre)
+  let _stickYArmed = true;  // axe Y — armement indépendant de l'axe X
   let _snapCooldown = false; // verrou partagé boutons + swipe
   let _prevLX = null; // position X gauche frame précédente (swipe)
+  let _floorY = 0;   // plancher dynamique — mis à jour au XRstart et à chaque téléport
 
-  const _rigQ = new THREE.Quaternion(); // réutilisable — évite l'allocation par frame
+  // Pré-alloués pour le raycast terrain — aucune allocation par appel
+  const _rigQ       = new THREE.Quaternion();
+  const _raycaster  = new THREE.Raycaster();
+  const _rayDown    = new THREE.Vector3(0, -1, 0);
+  const _rayOrigin  = new THREE.Vector3();
 
   // ── Init ──────────────────────────────────────────────────────────────────
 
@@ -30,6 +36,7 @@ const XRModule = (() => {
       ATON.XR.setupControllerUI();
       ATON.Nav.setFirstPersonControl();
       ATON.Nav.setUserControl(_bTeleportEnabled);
+      _floorY = ATON.XR.rig.position.y; // capture le sol au démarrage de la session
       _stickArmed = true;
       _stickYArmed = true;
       _snapCooldown = false;
@@ -47,8 +54,17 @@ const XRModule = (() => {
     // sans ce reset, les snaps précédents créent un décalage angulaire persistant.
     ATON.on("XRselectStart", (hand) => {
       if (hand !== ATON.XR.HAND_R) return;
-      if (!_bTeleportEnabled) return; // téléportation bloquée : pas de reset
+      if (!_bTeleportEnabled) return;
       ATON.XR.rig.rotation.set(0, 0, 0);
+    });
+
+    // Met à jour le plancher après chaque téléportation.
+    // ATON déplace le rig sur XRselectEnd (relâchement gâchette) — le délai
+    // de 50 ms laisse le temps au moteur de poser le rig sur le sol local.
+    ATON.on("XRselectEnd", (hand) => {
+      if (hand !== ATON.XR.HAND_R) return;
+      if (!_bTeleportEnabled) return;
+      setTimeout(() => { _floorY = ATON.XR.rig.position.y; }, 50);
     });
   }
 
@@ -106,9 +122,25 @@ const XRModule = (() => {
 
   function _cooldown() {
     _snapCooldown = true;
-    setTimeout(() => {
-      _snapCooldown = false;
-    }, SNAP_COOLDOWN);
+    setTimeout(() => { _snapCooldown = false; }, SNAP_COOLDOWN);
+  }
+
+  // Retourne le Y du terrain sous le rig via raycast vers le bas.
+  // Appelée uniquement sur snap descendant (one-shot, pas par frame).
+  // Fallback sur _floorY si aucun nœud terrain n'est visible ou pas d'intersection.
+  function _getTerrainY() {
+    let terrainNode = null;
+    for (const name of TERRAIN_NODES) {
+      const n = ATON.getSceneNode(name);
+      if (n?.visible) { terrainNode = n; break; }
+    }
+    if (!terrainNode) return _floorY;
+
+    const rig = ATON.XR.rig;
+    _rayOrigin.set(rig.position.x, rig.position.y + 100, rig.position.z);
+    _raycaster.set(_rayOrigin, _rayDown);
+    const hits = _raycaster.intersectObject(terrainNode, true);
+    return hits.length > 0 ? hits[0].point.y : _floorY;
   }
 
   function _updateSnap() {
@@ -130,16 +162,18 @@ const XRModule = (() => {
         }
       }
 
-      // Axe Y — snap altitude (haut = ax.y négatif sur Quest)
+      // Axe Y — snap altitude (pousser = monter, tirer = descendre)
       if (Math.abs(ax.y) < 0.2) {
         _stickYArmed = true;
       } else if (_stickYArmed) {
         const rig = ATON.XR.rig;
-        if (ax.y < -0.7) {
+        if (ax.y > 0.7) {
           rig.position.y += ALTITUDE_STEP;
           _stickYArmed = false;
-        } else if (ax.y > 0.7) {
-          rig.position.y = Math.max(FLOOR_Y, rig.position.y - ALTITUDE_STEP);
+        } else if (ax.y < -0.7) {
+          const localFloor = _getTerrainY();
+          _floorY = localFloor; // mise à jour du plancher de référence
+          rig.position.y = Math.max(localFloor, rig.position.y - ALTITUDE_STEP);
           _stickYArmed = false;
         }
       }
