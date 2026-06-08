@@ -17,7 +17,8 @@ const XRModule = (() => {
 
   // ── État interne ──────────────────────────────────────────────────────────
 
-  let _bTeleportEnabled = false; // guidée par défaut
+  let _bTeleportEnabled  = false; // guidée par défaut
+  let _bResetRotOnTeleport = true;  // false pour le médiateur (évite d'effacer les snaps accumulés)
   let _stickArmed  = true;  // thumbstick prêt à déclencher (reset au neutre)
   let _stickYArmed = true;  // axe Y — armement indépendant de l'axe X
   let _snapCooldown = false; // verrou partagé boutons + swipe
@@ -57,6 +58,7 @@ const XRModule = (() => {
     ATON.on("XRselectStart", (hand) => {
       if (hand !== ATON.XR.HAND_R) return;
       if (!_bTeleportEnabled) return;
+      if (!_bResetRotOnTeleport) return; // médiateur : conserve la rotation snap
       ATON.XR.rig.rotation.set(0, 0, 0);
     });
 
@@ -233,5 +235,9 @@ const XRModule = (() => {
     UI.toast(enabled ? "Navigation libre activée" : "Navigation guidée");
   }
 
-  return { init, update, setTeleportEnabled, ANNO_LABEL_T };
+  function setResetRotationOnTeleport(enabled) {
+    _bResetRotOnTeleport = enabled;
+  }
+
+  return { init, update, setTeleportEnabled, setResetRotationOnTeleport, ANNO_LABEL_T };
 })();
