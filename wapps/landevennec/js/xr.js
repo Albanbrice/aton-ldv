@@ -9,11 +9,14 @@ const XRModule = (() => {
   const SWIPE_ON_PRIMARY = false; // true = main droite (téléportation) ; false = main gauche (joystick / X·Y)
   const AVATAR_CULL_RADIUS = 0.5; // m — avatars trop proches masqués localement
   const ANNO_LABEL_T = 0.5; // 0..1 — position du label entre annotation (0) et œil (1)
+  const ALTITUDE_STEP = 0.5; // m par snap vertical (thumbstick Y gauche)
+  const FLOOR_Y = 0; // hauteur minimale du rig — empêche de passer sous le sol physique
 
   // ── État interne ──────────────────────────────────────────────────────────
 
   let _bTeleportEnabled = false; // guidée par défaut
   let _stickArmed = true; // thumbstick prêt à déclencher (reset au neutre)
+  let _stickYArmed = true; // axe Y — armement indépendant de l'axe X
   let _snapCooldown = false; // verrou partagé boutons + swipe
   let _prevLX = null; // position X gauche frame précédente (swipe)
 
@@ -28,6 +31,7 @@ const XRModule = (() => {
       ATON.Nav.setFirstPersonControl();
       ATON.Nav.setUserControl(_bTeleportEnabled);
       _stickArmed = true;
+      _stickYArmed = true;
       _snapCooldown = false;
       _prevLX = null;
     });
@@ -113,6 +117,7 @@ const XRModule = (() => {
     // que le stick revienne au neutre avant de permettre un nouveau snap.
     const ax = ATON.XR.getAxisValue(ATON.XR.HAND_SECONDARY);
     if (ax) {
+      // Axe X — snap rotation
       if (Math.abs(ax.x) < 0.2) {
         _stickArmed = true;
       } else if (_stickArmed) {
@@ -122,6 +127,20 @@ const XRModule = (() => {
         } else if (ax.x < -0.7) {
           _snap(+1);
           _stickArmed = false;
+        }
+      }
+
+      // Axe Y — snap altitude (haut = ax.y négatif sur Quest)
+      if (Math.abs(ax.y) < 0.2) {
+        _stickYArmed = true;
+      } else if (_stickYArmed) {
+        const rig = ATON.XR.rig;
+        if (ax.y < -0.7) {
+          rig.position.y += ALTITUDE_STEP;
+          _stickYArmed = false;
+        } else if (ax.y > 0.7) {
+          rig.position.y = Math.max(FLOOR_Y, rig.position.y - ALTITUDE_STEP);
+          _stickYArmed = false;
         }
       }
     }
