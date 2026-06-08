@@ -1,0 +1,22 @@
+{
+  "title": "Villa de Diomède",
+  "description": "\"Villa de Diomède, Pompei, état 2021\"",
+  "status": "complete",
+  "environment": { "lightprobes": { "auto": false } },
+  "scenegraph": {
+    "nodes": {
+      "main": {
+        "urls": ["https://tiles.archeo3d.org/diomede/tileset_villa_v01.json"],
+        "transform": {
+          "scale": [1, 1, 1],
+          "rotation": [1.57079632679, 3.1415, 0]
+        }
+      }
+    },
+    "edges": { ".": ["main"] }
+  },
+  "viewpoints": {},
+  "navmode": 0,
+  "visibility": 0,
+  "semanticgraph": { "nodes": {}, "edges": {} }
+}

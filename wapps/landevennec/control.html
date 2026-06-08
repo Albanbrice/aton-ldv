@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#0d0d14" />
+  <title>Landévennec — Médiateur</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%; height: 100%;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: #0d0d14;
+      color: #e0e0f0;
+      overflow-y: auto;
+    }
+
+    /* ── En-tête ── */
+    #status-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      background: rgba(13, 13, 20, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    #status-bar h1 {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #fff;
+      flex: 1;
+    }
+
+    .dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .dot-on  { background: #4ade80; box-shadow: 0 0 6px rgba(74,222,128,0.6); }
+    .dot-off { background: #ef4444; box-shadow: 0 0 6px rgba(239,68,68,0.4); }
+
+    #status-text {
+      font-size: 13px;
+      color: rgba(255,255,255,0.55);
+    }
+
+    #user-count {
+      font-size: 12px;
+      background: rgba(58,123,213,0.25);
+      color: #7aafff;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 500;
+    }
+
+    /* ── Contenu principal ── */
+    main {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    section {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 18px;
+    }
+
+    section h2 {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 14px;
+    }
+
+    /* ── Grille des points de vue ── */
+    #pov-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 10px;
+    }
+
+    .pov-btn {
+      height: 52px;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      background: rgba(58,123,213,0.12);
+      color: #d0d8ff;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s, border-color 0.15s;
+      padding: 0 14px;
+      text-align: center;
+    }
+
+    .pov-btn:hover  { background: rgba(58,123,213,0.28); border-color: rgba(90,150,255,0.3); }
+    .pov-btn:active { transform: scale(0.97); }
+    .pov-btn.flash  { background: rgba(58,123,213,0.55); border-color: rgba(120,180,255,0.6); }
+
+    /* ── Calques ── */
+    #layers-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .layer-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 4px 0;
+    }
+
+    .layer-label {
+      font-size: 14px;
+      color: #c8c8e0;
+      flex: 1;
+    }
+
+    .layer-toggle {
+      width: 80px;
+      height: 38px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.5);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+      letter-spacing: 0.05em;
+    }
+
+    .layer-toggle.active {
+      background: rgba(74,222,128,0.2);
+      border-color: rgba(74,222,128,0.4);
+      color: #4ade80;
+    }
+
+    /* ── Message ── */
+    #msg-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    #msg-input {
+      flex: 1;
+      height: 46px;
+      padding: 0 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.07);
+      color: #e0e0f0;
+      font-size: 14px;
+      outline: none;
+    }
+
+    #msg-input::placeholder { color: rgba(255,255,255,0.3); }
+    #msg-input:focus { border-color: rgba(58,123,213,0.5); }
+
+    #btn-send-msg {
+      height: 46px;
+      padding: 0 22px;
+      border-radius: 12px;
+      border: none;
+      background: #3a7bd5;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+
+    #btn-send-msg:hover  { background: #4a8be5; }
+    #btn-send-msg:active { background: #2d68b8; }
+    #btn-send-msg.flash  { background: #4ade80; color: #0a200a; }
+
+    /* ── Lien visiteurs ── */
+    #section-link p { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 10px; }
+
+    #visitor-url {
+      display: block;
+      font-family: monospace;
+      font-size: 12px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #7aafff;
+      word-break: break-all;
+      user-select: all;
+      cursor: text;
+    }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(58,123,213,0.9);
+      color: #fff;
+      padding: 10px 22px;
+      border-radius: 24px;
+      font-size: 13px;
+      font-weight: 500;
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      z-index: 50;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+  <!-- En-tête statut ─────────────────────────────────────────────────────── -->
+  <header id="status-bar">
+    <div class="dot dot-off" id="status-dot"></div>
+    <h1>Médiateur — Landévennec</h1>
+    <span id="status-text">Connexion…</span>
+    <span id="user-count" style="display:none"></span>
+  </header>
+
+  <main>
+
+    <!-- Navigation ───────────────────────────────────────────────────────── -->
+    <section id="section-nav">
+      <h2>Points de vue</h2>
+      <div id="pov-grid">
+        <!-- généré par control.js -->
+      </div>
+    </section>
+
+    <!-- Calques ──────────────────────────────────────────────────────────── -->
+    <section id="section-layers">
+      <h2>Calques</h2>
+      <div id="layers-list">
+        <!-- généré par control.js -->
+      </div>
+    </section>
+
+    <!-- Message ──────────────────────────────────────────────────────────── -->
+    <section id="section-msg">
+      <h2>Message aux visiteurs</h2>
+      <div id="msg-row">
+        <input id="msg-input" type="text" placeholder="Entrez un message…" autocomplete="off" />
+        <button id="btn-send-msg">Envoyer</button>
+      </div>
+    </section>
+
+    <!-- Lien visiteurs ───────────────────────────────────────────────────── -->
+    <section id="section-link">
+      <h2>Lien visiteurs</h2>
+      <p>Partagez cette adresse avec les visiteurs :</p>
+      <code id="visitor-url"></code>
+    </section>
+
+  </main>
+
+  <div id="toast"></div>
+
+  <script src="/vendors/vendors.min.js"></script>
+  <script src="/dist/THREE.bundle.js"></script>
+  <script src="/dist/ATON.min.js"></script>
+  <script src="js/control.js"></script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+{
+  "title": "Ilot des Comédiens, 2025",
+  "description": "\"Ilot des Comédiens, numérisation 3D état 2025\"",
+  "status": "complete",
+  "environment": { "lightprobes": { "auto": false } },
+  "scenegraph": {
+    "nodes": {
+      "main": {
+        "urls": [
+          "https://tiles.archeo3d.org/comediens/tileset_comediens_2025_mod.json"
+        ],
+        "transform": {
+          "scale": [1, 1, 1],
+          "rotation": [1.57079632679, 3.1415, 0]
+        }
+      }
+    },
+    "edges": { ".": ["main"] }
+  },
+  "viewpoints": {
+    "home": {
+      "position": [-0.6524896870450797, 33.84914281275296, -26.5025957431417],
+      "target": [-0.4985069809121992, -9.920663669277577, 0.009778619178756446],
+      "fov": 50
+    },
+    "Triton": {
+      "position": [-7.836958635523233, 0.41397260193630636, 3.017574659681115],
+      "target": [-10.630078895086678, -6.847944593460195, 3.130177806748822],
+      "fov": 50
+    },
+    "PT1": {
+      "position": [10.251713853205375, 2.226653576450772, -9.852607824472166],
+      "target": [10.296084752383344, -0.8637117791628047, -8.66418325314157],
+      "fov": 50
+    },
+    "PT1 interieur": {
+      "position": [10.861808537436463, -6.63578652724742, -8.467641917185128],
+      "target": [10.863697854401336, -3.9310390197637597, -8.269819513855696],
+      "fov": 50
+    },
+    "AC": {
+      "position": [-12.934882809150787, -1.121982172477355, -8.762050063770086],
+      "target": [5.7360661630883225, -7.703215979583204, -9.853408533190883],
+      "fov": 50
+    },
+    "CI2 canalisation 1": {
+      "position": [-9.958599339989252, -4.289998134526284, -9.014046297427058],
+      "target": [-15.164264459049187, -2.398803025380208, -10.146069011566562],
+      "fov": 50
+    },
+    "CI2 canalisation 2": {
+      "position": [-9.988032361202189, -4.021203013550857, -8.961049874500024],
+      "target": [-6.656245324252083, -1.991879342126203, -8.542702984499124],
+      "fov": 50
+    }
+  },
+  "navmode": 0,
+  "visibility": 0,
+  "semanticgraph": {
+    "nodes": {
+      "colonne 1": {
+        "spheres": [[10.72191, 2.23998, -3.41556, 0.05]],
+        "description": "\"<p>test colonne 1</p>\""
+      },
+      "métope": {
+        "convexshapes": [
+          [
+            0.88673, -1.4438, -3.9556, 2.0254, -1.5373, -3.9564, 2.0474,
+            -1.5252, -4.2039, 0.87675, -1.4223, -4.2145, 0.9692, -1.175, -4.175,
+            1.91, -1.198, -4.199, 1.899, -1.164, -4.076, 0.9609, -1.162, -3.995
+          ]
+        ],
+        "description": "\"<p>metope</p>\\n<p><img src=\\\"http://localhost:8080/collections/samples/media/sample-hls1/poster.jpg\\\"></p>\""
+      },
+      "Colonne 2": {
+        "convexshapes": [
+          [
+            10.299, -1.4534, -7.9783, 10.221, -1.5063, -7.6587, 10.351, -1.5137,
+            -7.4992, 10.573, -1.5195, -7.5347, 10.71, -1.522, -7.779, 10.65,
+            -1.379, -8.004, 10.64, -1.019, -7.898, 10.48, -1.02, -7.987, 10.32,
+            -1.019, -7.943, 10.23, -1.026, -7.743, 10.33, -1.022, -7.57, 10.55,
+            -1.03, -7.548, 10.66, -1.015, -7.656, 10.69, -1.017, -7.771, 10.44,
+            -1.02, -7.537, 10.27, -1.025, -7.648, 10.25, -1.014, -7.818, 10.23,
+            -1.504, -7.806, 10.67, -1.512, -7.643
+          ]
+        ],
+        "description": "\"<p>Ceci est un faux texte pour faire un test</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>\""
+      }
+    },
+    "edges": { ".": ["colonne 1", "métope", "Colonne 2"] }
+  }
+}

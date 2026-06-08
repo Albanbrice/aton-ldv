@@ -96,3 +96,14 @@ _prv
 !/wapps/README.txt
 !/wapps/app_template/
 /wapps/app_template/data/
+
+#################################
+#   Contenu Landévennec
+#################################
+
+!/wapps/landevennec/
+!/data/scenes/alban/
+!/data/collections/alban/
+!/config/
+config/users.json
+config/certs/
