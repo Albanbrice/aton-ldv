@@ -104,7 +104,7 @@ const Annotations = (() => {
         if (!sp || !ep) return;
 
         // Entre le point d'annotation et l'observateur, décalé vers la droite
-        panel.position.lerpVectors(sp, ep, 0.3);
+        panel.position.lerpVectors(sp, ep, XRModule.ANNO_LABEL_T);
         panel.position.x += 0.15;
         panel.setScale(0.4); // ≈ 0.4 m de large
         // lookAt bypasse Nav._qOri (qui exclut la rotation du rig après snap)

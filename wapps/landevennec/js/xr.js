@@ -4,10 +4,11 @@ const XRModule = (() => {
 
     // ── Constantes ────────────────────────────────────────────────────────────
 
-    const SNAP_ANGLE      = 15 * (Math.PI / 180); // radians
-    const SNAP_COOLDOWN   = 350;  // ms — délai minimum entre deux snaps (boutons/swipe)
-    const SWIPE_THRESHOLD = 0.05; // m/frame — vitesse minimale pour un swipe intentionnel
-    const AVATAR_CULL_RADIUS = 0.5; // m — avatars trop proches masqués localement
+    const SNAP_ANGLE         = 15 * (Math.PI / 180); // radians
+    const SNAP_COOLDOWN      = 350;  // ms — délai minimum entre deux snaps (boutons/swipe)
+    const SWIPE_THRESHOLD    = 0.05; // m/frame — vitesse minimale pour un swipe intentionnel
+    const AVATAR_CULL_RADIUS = 0.5;  // m — avatars trop proches masqués localement
+    const ANNO_LABEL_T       = 0.3;  // 0..1 — position du label entre annotation (0) et œil (1)
 
     // ── État interne ──────────────────────────────────────────────────────────
 
@@ -85,7 +86,7 @@ const XRModule = (() => {
         // Repositionnement — indépendant du controller
         const sp = ATON._queryDataSem?.p;
         const ep = ATON.Nav.getCurrentEyeLocation();
-        if (sp && ep) node.position.lerpVectors(sp, ep, 0.3);
+        if (sp && ep) node.position.lerpVectors(sp, ep, ANNO_LABEL_T);
 
         // Correction quaternion (snap rotation non incluse dans Nav._qOri)
         ATON.XR.rig.getWorldQuaternion(_rigQ);
@@ -154,5 +155,5 @@ const XRModule = (() => {
         UI.toast(enabled ? "Navigation libre activée" : "Navigation guidée");
     }
 
-    return { init, update, setTeleportEnabled };
+    return { init, update, setTeleportEnabled, ANNO_LABEL_T };
 })();
