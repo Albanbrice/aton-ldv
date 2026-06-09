@@ -14,13 +14,13 @@ const Help = (() => {
     <table>
       <tr><td>Joystick gauche ↑</td><td>Monter</td></tr>
       <tr><td>Joystick gauche ↓</td><td>Descendre</td></tr>
-    </table>
-    <h3>Se téléporter <span class="help-note">(si activé par le médiateur)</span></h3>
-    <p>Pointez avec la <strong>manette droite</strong> vers votre destination,
-       puis appuyez sur la <strong>gâchette index droit</strong> pour vous y rendre.</p>
+    </table>    
     <h3>Consulter une annotation</h3>
     <p>Pointez une zone qui s'illumine avec votre manette — un panneau d'information apparaît.
-       Pointez ailleurs pour le refermer.</p>`;
+       Pointez ailleurs pour le refermer.</p>
+       <h3>Se téléporter <span class="help-note">(si activé par le médiateur)</span></h3>
+    <p>Pointez avec la <strong>manette droite</strong> vers votre destination,
+       puis appuyez sur la <strong>gâchette index droit</strong> pour vous y rendre.</p>`;
 
   const _mainsNues = `
     <h3>Pivoter sur place <span class="help-note">(par pas de 15°)</span></h3>
@@ -33,12 +33,12 @@ const Help = (() => {
       <tr><td>Balayer la main gauche ↑</td><td>Monter</td></tr>
       <tr><td>Balayer la main gauche ↓</td><td>Descendre</td></tr>
     </table>
-    <h3>Se téléporter <span class="help-note">(si activé par le médiateur)</span></h3>
-    <p>Dirigez la <strong>main droite</strong> vers votre destination,
-       puis <strong>pincez</strong> l'index et le pouce pour vous y rendre.</p>
     <h3>Consulter une annotation</h3>
     <p>Approchez votre main d'une zone qui s'illumine — un panneau d'information apparaît.
-       Éloignez-vous pour le refermer.</p>`;
+       Éloignez-vous pour le refermer.</p>
+           <h3>Se téléporter <span class="help-note">(si activé par le médiateur)</span></h3>
+    <p>Dirigez la <strong>main droite</strong> vers votre destination,
+       puis <strong>pincez</strong> l'index et le pouce pour vous y rendre.</p>`;
 
   const _desktop = `
     <table>

@@ -81,9 +81,17 @@ body {
   letter-spacing: 0.02em;
 }
 
-.ctrl-btn:hover  { background: rgba(255, 255, 255, 0.16); transform: translateY(-1px); }
-.ctrl-btn:active { transform: scale(0.97); }
-.ctrl-btn svg    { flex-shrink: 0; opacity: 0.85; }
+.ctrl-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  transform: translateY(-1px);
+}
+.ctrl-btn:active {
+  transform: scale(0.97);
+}
+.ctrl-btn svg {
+  flex-shrink: 0;
+  opacity: 0.85;
+}
 
 #btn-enter-vr {
   background: linear-gradient(135deg, #3a7bd5, #2d5fa8);
@@ -91,7 +99,9 @@ body {
   font-weight: 600;
   box-shadow: 0 2px 12px rgba(58, 123, 213, 0.4);
 }
-#btn-enter-vr:hover { background: linear-gradient(135deg, #4a8be5, #3d6fb8); }
+#btn-enter-vr:hover {
+  background: linear-gradient(135deg, #4a8be5, #3d6fb8);
+}
 
 /* ── Panneau d'informations (annotations desktop) ────────────────────────── */
 #info-panel {
@@ -116,7 +126,10 @@ body {
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-#info-panel.visible { opacity: 1; transform: translateX(0); }
+#info-panel.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
 
 #info-panel h3 {
   font-size: 16px;
@@ -137,7 +150,9 @@ body {
   line-height: 1;
   transition: color 0.2s;
 }
-#info-panel-close:hover { color: #fff; }
+#info-panel-close:hover {
+  color: #fff;
+}
 
 /* ── Écran de chargement ─────────────────────────────────────────────────── */
 #loading-screen {
@@ -168,7 +183,9 @@ body {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .loader-text {
@@ -270,8 +287,15 @@ body {
 }
 
 @keyframes pulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50%       { transform: scale(1.2); opacity: 0.7; }
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
 }
 
 .collab-text {
@@ -280,7 +304,9 @@ body {
 }
 
 /* ── Toast — position spécifique aux pages viewer (au-dessus des contrôles) ─ */
-#toast { bottom: 90px; }
+#toast {
+  bottom: 90px;
+}
 
 /* ── Splash PWA — guide d'utilisation + portail VR (mode installé Quest) ───── */
 #vr-splash {
@@ -293,7 +319,10 @@ body {
   transition: opacity 0.4s ease;
   font-family: var(--font);
 }
-#vr-splash.hiding { opacity: 0; pointer-events: none; }
+#vr-splash.hiding {
+  opacity: 0;
+  pointer-events: none;
+}
 
 #vr-splash-header {
   padding: 1.6rem 2rem 1rem;
@@ -308,7 +337,7 @@ body {
   margin-bottom: 0.25rem;
 }
 #vr-splash-header p {
-  color: rgba(255,255,255,0.45);
+  color: rgba(255, 255, 255, 0.45);
   font-size: 0.95rem;
 }
 
@@ -316,7 +345,7 @@ body {
 #vr-splash-tabs {
   display: flex;
   flex-shrink: 0;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   max-width: 660px;
   width: 100%;
   margin: 0 auto;
@@ -328,7 +357,7 @@ body {
   background: none;
   border: none;
   border-bottom: 3px solid transparent;
-  color: rgba(255,255,255,0.4);
+  color: rgba(255, 255, 255, 0.2);
   font-family: var(--font);
   font-size: 0.95rem;
   font-weight: 700;
@@ -339,7 +368,9 @@ body {
   cursor: pointer;
   transition: color 0.15s;
 }
-.vr-splash-tab:hover { color: rgba(255,255,255,0.75); }
+.vr-splash-tab:hover {
+  color: rgba(255, 255, 255, 0.75);
+}
 .vr-splash-tab.active {
   color: #fff;
   border-bottom-color: var(--color-blue);
@@ -356,7 +387,7 @@ body {
   box-sizing: border-box;
 }
 #vr-splash-content h3 {
-  color: rgba(255,255,255,0.9);
+  color: rgba(255, 255, 255, 0.9);
   font-size: 0.9rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -364,40 +395,45 @@ body {
   margin-top: 1.2rem;
   margin-bottom: 0.5rem;
 }
-#vr-splash-content h3:first-child { margin-top: 0; }
-#vr-splash-content table { width: 100%; border-collapse: collapse; }
+#vr-splash-content h3:first-child {
+  margin-top: 0;
+}
+#vr-splash-content table {
+  width: 100%;
+  border-collapse: collapse;
+}
 #vr-splash-content td {
   padding: 0.4rem 0.5rem;
   font-size: 0.95rem;
-  color: rgba(255,255,255,0.75);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  color: rgba(255, 255, 255, 0.75);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   vertical-align: top;
   line-height: 1.4;
 }
 #vr-splash-content td:first-child {
-  color: rgba(255,255,255,0.95);
+  color: rgba(255, 255, 255, 0.95);
   white-space: nowrap;
   padding-right: 1.2rem;
   width: 55%;
 }
 #vr-splash-content p {
   font-size: 0.95rem;
-  color: rgba(255,255,255,0.65);
+  color: rgba(255, 255, 255, 0.65);
   margin-bottom: 0.4rem;
   line-height: 1.5;
 }
 #vr-splash-content .help-note {
   font-weight: 400;
   font-size: 0.8rem;
-  color: rgba(255,255,255,0.35);
+  color: rgba(255, 255, 255, 0.35);
   text-transform: none;
   letter-spacing: 0;
 }
 #vr-splash-content .help-intro {
   font-size: 0.9rem;
   font-style: italic;
-  color: rgba(255,255,255,0.5);
-  background: rgba(255,255,255,0.04);
+  color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.04);
   border-radius: 0.3rem;
   padding: 0.6rem 0.8rem;
   margin-bottom: 0.8rem;
@@ -427,10 +463,21 @@ body {
   letter-spacing: 0.03em;
   transition: opacity 0.2s;
 }
-#vr-splash-btn:active { opacity: 0.75; }
-#vr-splash-btn svg { animation: vr-pulse 2.4s ease-in-out infinite; }
+#vr-splash-btn:active {
+  opacity: 0.75;
+}
+#vr-splash-btn svg {
+  animation: vr-pulse 2.4s ease-in-out infinite;
+}
 
 @keyframes vr-pulse {
-  0%, 100% { opacity: 1;   transform: scale(1);    }
-  50%       { opacity: 0.7; transform: scale(0.88); }
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(0.88);
+  }
 }
