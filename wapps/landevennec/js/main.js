@@ -23,30 +23,13 @@ APP.setup = () => {
     XRModule.init();
     Help.init(Help.VISITOR_SECTIONS);
 
-    // Auto-enter VR when launched as installed PWA (Quest launcher)
-    // requestSession() requires a user gesture — except when Quest pre-grants a session
-    // via the "sessiongranted" event (fired when launching from the Quest library).
-    // We coordinate both signals: session granted + assets loaded.
+    // Splash "toucher pour démarrer" quand lancé depuis la bibliothèque Quest (PWA)
+    // requestSession() exige un geste utilisateur — on le capture via le tap sur le splash.
     const _bPWA = window.matchMedia('(display-mode: fullscreen)').matches
                || window.matchMedia('(display-mode: standalone)').matches;
-    if (_bPWA && navigator.xr) {
-        let _granted = false;
-        let _loaded  = false;
-
-        const _tryEnterVR = () => {
-            if (!_granted || !_loaded) return;
-            if (!ATON.XR.isPresenting()) ATON.XR.toggle("immersive-vr");
-        };
-
-        navigator.xr.addEventListener("sessiongranted", () => {
-            _granted = true;
-            _tryEnterVR();
-        });
-
+    if (_bPWA) {
         ATON.on("AllNodeRequestsCompleted", () => {
-            if (_loaded) return;
-            _loaded = true;
-            setTimeout(_tryEnterVR, 500);
+            setTimeout(_showVRSplash, 300);
         });
     }
 };
@@ -54,3 +37,23 @@ APP.setup = () => {
 APP.update = () => {
     XRModule.update();
 };
+
+function _showVRSplash() {
+    const splash = document.createElement("div");
+    splash.id = "vr-splash";
+    splash.innerHTML = `
+        <div id="vr-splash-inner">
+            <svg width="72" height="72" viewBox="0 0 24 24" fill="none"
+                 stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z"/>
+                <circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/>
+            </svg>
+            <p>Toucher pour démarrer la visite</p>
+        </div>`;
+    splash.addEventListener("click", () => {
+        splash.classList.add("hiding");
+        splash.addEventListener("transitionend", () => splash.remove(), { once: true });
+        if (!ATON.XR.isPresenting()) ATON.XR.toggle("immersive-vr");
+    });
+    document.body.appendChild(splash);
+}

@@ -281,3 +281,41 @@ body {
 
 /* ── Toast — position spécifique aux pages viewer (au-dessus des contrôles) ─ */
 #toast { bottom: 90px; }
+
+/* ── Splash PWA — écran "toucher pour démarrer" (mode installé Quest) ─────── */
+#vr-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: var(--bg-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.4s ease;
+}
+#vr-splash.hiding { opacity: 0; pointer-events: none; }
+
+#vr-splash-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  user-select: none;
+}
+
+#vr-splash-inner svg {
+  animation: vr-pulse 2.4s ease-in-out infinite;
+}
+
+#vr-splash-inner p {
+  color: rgba(255, 255, 255, 0.75);
+  font-family: var(--font);
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+}
+
+@keyframes vr-pulse {
+  0%, 100% { opacity: 1;   transform: scale(1);    }
+  50%       { opacity: 0.5; transform: scale(0.92); }
+}
