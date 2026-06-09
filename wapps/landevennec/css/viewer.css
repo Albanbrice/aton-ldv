@@ -282,40 +282,136 @@ body {
 /* ── Toast — position spécifique aux pages viewer (au-dessus des contrôles) ─ */
 #toast { bottom: 90px; }
 
-/* ── Splash PWA — écran "toucher pour démarrer" (mode installé Quest) ─────── */
+/* ── Splash PWA — guide d'utilisation + portail VR (mode installé Quest) ───── */
 #vr-splash {
   position: fixed;
   inset: 0;
   z-index: 500;
   background: var(--bg-dark);
   display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
+  flex-direction: column;
+  overflow-y: auto;
   transition: opacity 0.4s ease;
+  font-family: var(--font);
 }
 #vr-splash.hiding { opacity: 0; pointer-events: none; }
 
-#vr-splash-inner {
+#vr-splash-header {
+  padding: 1.4rem 1.5rem 0.8rem;
+  text-align: center;
+  flex-shrink: 0;
+}
+#vr-splash-header h1 {
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.2rem;
+}
+#vr-splash-header p {
+  color: rgba(255,255,255,0.45);
+  font-size: 0.78rem;
+}
+
+#vr-splash-cols {
   display: flex;
-  flex-direction: column;
+  flex: 1;
+  gap: 1px;
+  background: rgba(255,255,255,0.07);
+  min-height: 0;
+}
+
+.vr-splash-col {
+  flex: 1;
+  padding: 1rem 1.1rem;
+  background: var(--bg-dark);
+  overflow-y: auto;
+}
+.vr-splash-col-title {
+  color: var(--color-blue);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.7rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+/* réutilise les styles .help-content pour les tables et titres */
+.vr-splash-col h3 {
+  color: rgba(255,255,255,0.9);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 0.9rem;
+  margin-bottom: 0.35rem;
+}
+.vr-splash-col h3:first-child { margin-top: 0; }
+.vr-splash-col table { width: 100%; border-collapse: collapse; }
+.vr-splash-col td {
+  padding: 0.25rem 0.4rem;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.75);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  vertical-align: top;
+}
+.vr-splash-col td:first-child {
+  color: rgba(255,255,255,0.95);
+  white-space: nowrap;
+  padding-right: 0.8rem;
+  width: 55%;
+}
+.vr-splash-col p {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.65);
+  margin-bottom: 0.3rem;
+}
+.vr-splash-col .help-note {
+  font-weight: 400;
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.35);
+  text-transform: none;
+  letter-spacing: 0;
+}
+.vr-splash-col .help-intro {
+  font-size: 0.72rem;
+  font-style: italic;
+  color: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.04);
+  border-radius: 0.3rem;
+  padding: 0.4rem 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+#vr-splash-cta {
+  flex-shrink: 0;
+  padding: 1.2rem 1.5rem 1.6rem;
+  display: flex;
+  justify-content: center;
+  background: linear-gradient(to bottom, transparent, var(--bg-dark) 30%);
+}
+
+#vr-splash-btn {
+  display: flex;
   align-items: center;
-  gap: 1.5rem;
-  user-select: none;
-}
-
-#vr-splash-inner svg {
-  animation: vr-pulse 2.4s ease-in-out infinite;
-}
-
-#vr-splash-inner p {
-  color: rgba(255, 255, 255, 0.75);
+  gap: 0.75rem;
+  background: var(--color-blue);
+  border: none;
+  border-radius: 2rem;
+  color: #fff;
   font-family: var(--font);
   font-size: 1rem;
-  letter-spacing: 0.06em;
+  font-weight: 600;
+  padding: 0.85rem 2rem;
+  cursor: pointer;
+  letter-spacing: 0.03em;
+  transition: opacity 0.2s;
 }
+#vr-splash-btn:active { opacity: 0.75; }
+#vr-splash-btn svg { animation: vr-pulse 2.4s ease-in-out infinite; }
 
 @keyframes vr-pulse {
   0%, 100% { opacity: 1;   transform: scale(1);    }
-  50%       { opacity: 0.5; transform: scale(0.92); }
+  50%       { opacity: 0.7; transform: scale(0.88); }
 }

@@ -39,21 +39,39 @@ APP.update = () => {
 };
 
 function _showVRSplash() {
+    // Sections VR uniquement (exclut "Navigateur")
+    const sections = Help.VISITOR_SECTIONS.filter(s => s.label.startsWith("VR"));
+
+    const cols = sections.map(s => `
+        <div class="vr-splash-col">
+            <div class="vr-splash-col-title">${s.label.replace("VR — ", "")}</div>
+            ${s.html}
+        </div>`).join("");
+
     const splash = document.createElement("div");
     splash.id = "vr-splash";
     splash.innerHTML = `
-        <div id="vr-splash-inner">
-            <svg width="72" height="72" viewBox="0 0 24 24" fill="none"
-                 stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M2 8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z"/>
-                <circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/>
-            </svg>
-            <p>Toucher pour démarrer la visite</p>
+        <div id="vr-splash-header">
+            <h1>Visite guidée</h1>
+            <p>Abbaye de Landévennec</p>
+        </div>
+        <div id="vr-splash-cols">${cols}</div>
+        <div id="vr-splash-cta">
+            <button id="vr-splash-btn">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z"/>
+                    <circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/>
+                </svg>
+                Démarrer la visite
+            </button>
         </div>`;
-    splash.addEventListener("click", () => {
+
+    document.body.appendChild(splash);
+
+    splash.querySelector("#vr-splash-btn").addEventListener("click", () => {
         splash.classList.add("hiding");
         splash.addEventListener("transitionend", () => splash.remove(), { once: true });
         if (!ATON.XR.isPresenting()) ATON.XR.toggle("immersive-vr");
     });
-    document.body.appendChild(splash);
 }
