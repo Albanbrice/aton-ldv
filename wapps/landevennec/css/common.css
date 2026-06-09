@@ -56,6 +56,7 @@
   z-index: 400;
   align-items: center;
   justify-content: center;
+  pointer-events: all;
 }
 #help-overlay.open { display: flex; }
 
