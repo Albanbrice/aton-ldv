@@ -165,7 +165,8 @@ const Help = (() => {
     modal.appendChild(tabBar);
     modal.appendChild(content);
     _overlay.appendChild(modal);
-    document.body.appendChild(_overlay);
+    // Append dans #ui-overlay pour rester visible en mode WebXR DOM overlay
+    (document.getElementById("ui-overlay") || document.body).appendChild(_overlay);
 
     // Mesure la hauteur de chaque onglet pour figer le contenu à la plus grande
     _overlay.style.visibility = "hidden";
