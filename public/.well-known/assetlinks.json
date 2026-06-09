@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "org.archeo3d.aton.twa",
+      "sha256_cert_fingerprints": [
+        "B2:55:3F:57:0C:A4:9F:11:4A:B1:63:84:91:5A:51:F3:20:8D:13:D4:0B:63:7E:B9:CD:72:30:BC:95:79:84:A6"
+      ]
+    }
+  }
+]
