@@ -39,14 +39,7 @@ APP.update = () => {
 };
 
 function _showVRSplash() {
-    // Sections VR uniquement (exclut "Navigateur")
     const sections = Help.VISITOR_SECTIONS.filter(s => s.label.startsWith("VR"));
-
-    const cols = sections.map(s => `
-        <div class="vr-splash-col">
-            <div class="vr-splash-col-title">${s.label.replace("VR — ", "")}</div>
-            ${s.html}
-        </div>`).join("");
 
     const splash = document.createElement("div");
     splash.id = "vr-splash";
@@ -55,10 +48,11 @@ function _showVRSplash() {
             <h1>Visite guidée</h1>
             <p>Abbaye de Landévennec</p>
         </div>
-        <div id="vr-splash-cols">${cols}</div>
+        <div id="vr-splash-tabs"></div>
+        <div id="vr-splash-content"></div>
         <div id="vr-splash-cta">
             <button id="vr-splash-btn">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none"
                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M2 8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z"/>
                     <circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/>
@@ -68,6 +62,23 @@ function _showVRSplash() {
         </div>`;
 
     document.body.appendChild(splash);
+
+    const tabBar  = splash.querySelector("#vr-splash-tabs");
+    const content = splash.querySelector("#vr-splash-content");
+
+    content.innerHTML = sections[0].html;
+    sections.forEach((s, i) => {
+        const tab = document.createElement("button");
+        tab.className = "vr-splash-tab" + (i === 0 ? " active" : "");
+        tab.textContent = s.label.replace("VR — ", "");
+        tab.addEventListener("click", () => {
+            tabBar.querySelectorAll(".vr-splash-tab").forEach(t => t.classList.remove("active"));
+            tab.classList.add("active");
+            content.innerHTML = s.html;
+            content.scrollTop = 0;
+        });
+        tabBar.appendChild(tab);
+    });
 
     splash.querySelector("#vr-splash-btn").addEventListener("click", () => {
         splash.classList.add("hiding");
