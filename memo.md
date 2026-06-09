@@ -94,6 +94,58 @@ ATON.MRes.setXRResolution(1600, 1700); // online
 
 ---
 
+## Patch Hathor — à ré-appliquer après chaque `git merge upstream`
+
+Fondu CSS de la barre d'outils Hathor lors de la navigation (remplace le masquage instantané).
+Écrasé par les mises à jour upstream — ré-appliquer manuellement.
+
+### 1. `public/hathor/ui.js` — remplacer le handler `NavInteraction`
+
+Chercher le bloc (dans `UI.setup`) :
+```js
+ATON.on("NavInteraction", b => {
+    if (HATHOR.currTask) return;
+    if (b){ UI.hideMainElements(); }
+    else  { UI.showMainElements(); }
+});
+```
+Le remplacer par :
+```js
+ATON.on("NavInteraction", (b) => {
+    if (HATHOR.currTask) return;
+    if (b) { UI.fadeOutMainElements(); }
+    else   { UI.fadeInMainElements();  }
+});
+```
+
+### 2. `public/hathor/ui.js` — ajouter les deux méthodes (n'importe où après `UI.hideMainElements`)
+
+```js
+UI.fadeOutMainElements = () => {
+    [UI._elMainToolbar, UI._elBottomToolbar, UI._elUserToolbar, UI._elSidePanel]
+        .forEach(el => el?.classList.add("aton-fadeout"));
+};
+
+UI.fadeInMainElements = () => {
+    [UI._elMainToolbar, UI._elBottomToolbar, UI._elUserToolbar, UI._elSidePanel]
+        .forEach(el => el?.classList.remove("aton-fadeout"));
+};
+```
+
+### 3. `public/res/css/main.css` — ajouter la règle CSS du fondu
+
+```css
+.aton-fadeout {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 0.4s ease;
+}
+```
+
+> Aucun rebuild de bundle nécessaire (`public/hathor/` est servi directement, pas via webpack).
+
+---
+
 ## Git
 
 ```bash
@@ -106,6 +158,7 @@ git push
 git fetch upstream
 git merge upstream/master
 # → ré-appliquer le patch ATON.mres.js + npm run build-aton
+# → ré-appliquer le patch Hathor fadeout (public/hathor/ui.js + public/res/css/main.css)
 git push
 ```
 
