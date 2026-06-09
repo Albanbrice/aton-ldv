@@ -24,13 +24,29 @@ APP.setup = () => {
     Help.init(Help.VISITOR_SECTIONS);
 
     // Auto-enter VR when launched as installed PWA (Quest launcher)
-    if (window.matchMedia('(display-mode: fullscreen)').matches
-     || window.matchMedia('(display-mode: standalone)').matches) {
-        let _autoVRdone = false;
+    // requestSession() requires a user gesture — except when Quest pre-grants a session
+    // via the "sessiongranted" event (fired when launching from the Quest library).
+    // We coordinate both signals: session granted + assets loaded.
+    const _bPWA = window.matchMedia('(display-mode: fullscreen)').matches
+               || window.matchMedia('(display-mode: standalone)').matches;
+    if (_bPWA && navigator.xr) {
+        let _granted = false;
+        let _loaded  = false;
+
+        const _tryEnterVR = () => {
+            if (!_granted || !_loaded) return;
+            if (!ATON.XR.isPresenting()) ATON.XR.toggle("immersive-vr");
+        };
+
+        navigator.xr.addEventListener("sessiongranted", () => {
+            _granted = true;
+            _tryEnterVR();
+        });
+
         ATON.on("AllNodeRequestsCompleted", () => {
-            if (_autoVRdone) return;
-            _autoVRdone = true;
-            setTimeout(() => { if (!ATON.XR.isPresenting()) ATON.XR.toggle("immersive-vr"); }, 500);
+            if (_loaded) return;
+            _loaded = true;
+            setTimeout(_tryEnterVR, 500);
         });
     }
 };
