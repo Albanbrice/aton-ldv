@@ -22,6 +22,17 @@ APP.setup = () => {
     Annotations.init();
     XRModule.init();
     Help.init(Help.VISITOR_SECTIONS);
+
+    // Auto-enter VR when launched as installed PWA (Quest launcher)
+    if (window.matchMedia('(display-mode: fullscreen)').matches
+     || window.matchMedia('(display-mode: standalone)').matches) {
+        let _autoVRdone = false;
+        ATON.on("AllNodeRequestsCompleted", () => {
+            if (_autoVRdone) return;
+            _autoVRdone = true;
+            setTimeout(() => { if (!ATON.XR.isPresenting()) ATON.XR.toggle("immersive-vr"); }, 500);
+        });
+    }
 };
 
 APP.update = () => {

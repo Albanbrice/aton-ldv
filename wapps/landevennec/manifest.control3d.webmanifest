@@ -1,11 +1,11 @@
 {
-    "name": "Landévennec — Visite VR",
-    "short_name": "Visite VR",
-    "description": "Visite virtuelle guidée de l'abbaye de Landévennec",
+    "name": "Landévennec — Médiateur 3D",
+    "short_name": "Médiateur 3D",
+    "description": "Interface médiateur avec vue immersive 3D — abbaye de Landévennec",
     "display": "fullscreen",
     "orientation": "any",
     "scope": "/a/landevennec/",
-    "start_url": "/a/landevennec/",
+    "start_url": "/a/landevennec/control3d.html",
     "theme_color": "#0a0a0f",
     "background_color": "#0a0a0f",
     "icons": [
