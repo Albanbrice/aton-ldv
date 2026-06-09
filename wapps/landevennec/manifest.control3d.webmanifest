@@ -1,19 +1,19 @@
 {
-    "name": "Landévennec — Médiateur 3D",
-    "short_name": "Médiateur 3D",
-    "description": "Interface médiateur avec vue immersive 3D — abbaye de Landévennec",
-    "display": "fullscreen",
-    "orientation": "any",
-    "scope": "/a/landevennec/",
-    "start_url": "/a/landevennec/control3d.html",
-    "theme_color": "#0a0a0f",
-    "background_color": "#0a0a0f",
-    "icons": [
-        {
-            "src": "appicon.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "any maskable"
-        }
-    ]
+  "name": "Landévennec — Médiateur 3D",
+  "short_name": "Médiateur 3D",
+  "description": "Interface médiateur avec vue immersive 3D — abbaye de Landévennec",
+  "display": "fullscreen",
+  "orientation": "any",
+  "scope": "/a/landevennec/",
+  "start_url": "/a/landevennec/control3d.html",
+  "theme_color": "#0a0a0f",
+  "background_color": "#0a0a0f",
+  "icons": [
+    {
+      "src": "appicon-control3d.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
 }

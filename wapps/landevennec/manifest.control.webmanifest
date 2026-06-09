@@ -1,19 +1,19 @@
 {
-    "name": "Landévennec — Médiateur",
-    "short_name": "Médiateur",
-    "description": "Panneau de contrôle médiateur — abbaye de Landévennec",
-    "display": "standalone",
-    "orientation": "any",
-    "scope": "/a/landevennec/",
-    "start_url": "/a/landevennec/control.html",
-    "theme_color": "#0d0d14",
-    "background_color": "#0d0d14",
-    "icons": [
-        {
-            "src": "appicon.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "any maskable"
-        }
-    ]
+  "name": "Landévennec — Médiateur",
+  "short_name": "Médiateur",
+  "description": "Panneau de contrôle médiateur — abbaye de Landévennec",
+  "display": "standalone",
+  "orientation": "any",
+  "scope": "/a/landevennec/",
+  "start_url": "/a/landevennec/control.html",
+  "theme_color": "#0d0d14",
+  "background_color": "#0d0d14",
+  "icons": [
+    {
+      "src": "appicon-control.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
 }
