@@ -37,6 +37,8 @@ MRes.init = ()=>{
     };
 
     MRes._tseBase = 16.0; //8.0;
+    MRes._xrResW = 1600;  // XR resolution hint (Meta Quest 3 ~75% native, online default)
+    MRes._xrResH = 1700;
     MRes.estimateTSErrorTarget();
 
     MRes._tsuSync = 0;
@@ -126,13 +128,18 @@ MRes.updateTSetsCamera = (cam)=>{
             const leftCam = xrCam.cameras[ 0 ];
             if ( leftCam ) TS.setResolution( xrCam, leftCam.viewport.z, leftCam.viewport.w );
 */
-            TS.setResolution( cam, 600,600 ); // 300
+            TS.setResolution( cam, MRes._xrResW, MRes._xrResH );
             //TS.setResolutionFromRenderer( cam, ATON._renderer );            
         }
         else {
             TS.setResolutionFromRenderer( cam, ATON._renderer );
         }
     }
+};
+
+MRes.setXRResolution = (w, h)=>{
+    MRes._xrResW = w;
+    MRes._xrResH = h;
 };
 
 MRes.setBaseTSE = (tse)=>{
@@ -146,7 +153,7 @@ MRes.estimateTSErrorTarget = ()=>{
     let tse = MRes._tseBase;
 
     if (ATON.device.lowGPU || ATON.device.isMobile) tse *= 1.5; // += 4.0;
-    if (ATON.XR._bPresenting) tse *= 1.2;
+    //if (ATON.XR._bPresenting) tse *= 1.2; // disabled: use setXRResolution() instead
 
     if (tse < 1.0)  tse = 1.0;
     //if (tse > 25.0) tse = 25.0;

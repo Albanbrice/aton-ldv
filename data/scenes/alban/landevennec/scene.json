@@ -5,17 +5,12 @@
   "environment": { "lightprobes": { "auto": false } },
   "scenegraph": {
     "nodes": {
-      "main": {
-        "urls": []
-      },
+      "main": { "urls": [] },
       "etat-actuel": {
         "urls": [
           "https://tiles.archeo3d.org/landevennec/tileset_2026-06_Abbaye.json"
         ],
-        "transform": {
-          "scale": [1, 1, 1],
-          "rotation": [-1.57079632679, 0, 0]
-        }
+        "transform": { "scale": [1, 1, 1], "rotation": [-1.57079632679, 0, 0] }
       },
       "restitution-XIIIe": {
         "urls": ["alban/models/abbaye_001.glb"],
@@ -71,16 +66,25 @@
   "visibility": 0,
   "semanticgraph": {
     "nodes": {
-      "gradlon": {
+      "porterie": {
         "convexshapes": [
           [
-            -9.267, -3.0821, -1.7355, -9.4444, -3.1026, -2.1858, -9.6651,
-            -2.935, -2.128, -9.5496, -2.9161, -1.6568
+            -15.725, 8.5243, 10.675, -15.963, 8.3217, 10.703, -15.941, 8.3478,
+            11.147, -15.682, 8.5427, 11.123
           ]
         ],
-        "description": "\"<p>tombe de gradlon</p>\""
+        "description": "\"<p>Texte à insérer</p>\""
+      },
+      "tombeau-gradlon": {
+        "convexshapes": [
+          [
+            7.6743, 7.3572, -8.7296, 7.4342, 7.1932, -8.6781, 7.515, 7.1862,
+            -8.2437, 7.7466, 7.351, -8.2917
+          ]
+        ],
+        "description": "\"<p>tombe de gradlon</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</p><p><br></p><p><br></p>\""
       }
     },
-    "edges": { ".": ["gradlon"] }
+    "edges": { ".": ["porterie", "tombeau-gradlon"] }
   }
 }
