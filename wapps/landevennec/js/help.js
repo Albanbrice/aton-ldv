@@ -4,13 +4,13 @@ const Help = (() => {
   // ── Contenu visiteur ─────────────────────────────────────────────────────
 
   const _manettes = `
-    <h3>Pivoter sur place <span class="help-note">(par cran de 15°)</span></h3>
+    <h3>Pivoter sur place <span class="help-note">(par pas de 15°)</span></h3>
     <table>
       <tr><td>Joystick gauche ← →</td><td>Tourner à gauche / droite</td></tr>
       <tr><td>Bouton <strong>X</strong></td><td>Tourner à gauche</td></tr>
       <tr><td>Bouton <strong>Y</strong></td><td>Tourner à droite</td></tr>
     </table>
-    <h3>Monter / Descendre <span class="help-note">(par cran de 2 m)</span></h3>
+    <h3>Monter / Descendre <span class="help-note">(par pas de 2 m)</span></h3>
     <table>
       <tr><td>Joystick gauche ↑</td><td>Monter</td></tr>
       <tr><td>Joystick gauche ↓</td><td>Descendre</td></tr>
@@ -23,14 +23,12 @@ const Help = (() => {
        Pointez ailleurs pour le refermer.</p>`;
 
   const _mainsNues = `
-    <p class="help-intro">Le casque reconnaît vos mains directement.
-       Gardez-les dans votre champ de vision pour que les gestes soient bien détectés.</p>
-    <h3>Pivoter sur place <span class="help-note">(par cran de 15°)</span></h3>
+    <h3>Pivoter sur place <span class="help-note">(par pas de 15°)</span></h3>
     <table>
-      <tr><td>Balayer la main gauche → droite</td><td>Tourner à droite</td></tr>
-      <tr><td>Balayer la main gauche → gauche</td><td>Tourner à gauche</td></tr>
+      <tr><td>Balayer la main gauche vers la droite</td><td>Tourner à droite</td></tr>
+      <tr><td>Balayer la main gauche vers la gauche</td><td>Tourner à gauche</td></tr>
     </table>
-    <h3>Monter / Descendre <span class="help-note">(par cran de 2 m)</span></h3>
+    <h3>Monter / Descendre <span class="help-note">(par pas de 2 m)</span></h3>
     <table>
       <tr><td>Balayer la main gauche ↑</td><td>Monter</td></tr>
       <tr><td>Balayer la main gauche ↓</td><td>Descendre</td></tr>
@@ -166,7 +164,9 @@ const Help = (() => {
     modal.appendChild(content);
     _overlay.appendChild(modal);
     // Append dans #ui-overlay pour rester visible en mode WebXR DOM overlay
-    (document.getElementById("ui-overlay") || document.body).appendChild(_overlay);
+    (document.getElementById("ui-overlay") || document.body).appendChild(
+      _overlay
+    );
 
     // Mesure la hauteur de chaque onglet pour figer le contenu à la plus grande
     _overlay.style.visibility = "hidden";
