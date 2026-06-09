@@ -32,12 +32,8 @@ UI.setup = ()=>{
     ATON.on("NavInteraction", b =>{
         if (HATHOR.currTask) return;
 
-        if (b){
-            UI.hideMainElements();
-        }
-        else {
-            UI.showMainElements();
-        }
+        if (b){ UI.fadeOutMainElements(); }
+        else  { UI.fadeInMainElements();  }
     });
 };
 
@@ -537,6 +533,16 @@ UI.showMainElements = ()=>{
     ATON.UI.showElement(UI._elBottomToolbar);
     ATON.UI.showElement(UI._elUserToolbar);
     ATON.UI.showElement(UI._elSidePanel);
+};
+
+UI.fadeOutMainElements = ()=>{
+    [UI._elMainToolbar, UI._elBottomToolbar, UI._elUserToolbar, UI._elSidePanel]
+        .forEach(el => el?.classList.add("aton-fadeout"));
+};
+
+UI.fadeInMainElements = ()=>{
+    [UI._elMainToolbar, UI._elBottomToolbar, UI._elUserToolbar, UI._elSidePanel]
+        .forEach(el => el?.classList.remove("aton-fadeout"));
 };
 
 UI.enterEditorMode = ()=>{
