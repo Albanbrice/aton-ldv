@@ -21,6 +21,7 @@ APP.setup = () => {
     // Le médiateur navigue toujours librement et conserve sa rotation snap entre téléportations
     XRModule.setTeleportEnabled(true);
     XRModule.setResetRotationOnTeleport(false);
+    Help.init(Help.MEDIATOR_SECTIONS);
 
     _initPhoton();
     _buildMediatorPanel();

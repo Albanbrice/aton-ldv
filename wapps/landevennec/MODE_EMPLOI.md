@@ -171,7 +171,7 @@ dans la scène pour les autres participants.
 - **Partager ma vue** : envoie aux visiteurs exactement le point de vue en cours
   (position et angle de caméra) — utile pour guider l'attention sur un détail précis.
 - Le **panneau de contrôle** (boutons calques, POVs, navigation…) s'ouvre et se ferme
-  via le bouton en haut à droite de l'écran.
+  via le bouton sur le côté droit de l'écran.
 
 ### Contrôles VR du médiateur (même casque que les visiteurs)
 

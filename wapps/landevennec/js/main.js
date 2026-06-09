@@ -21,6 +21,7 @@ APP.setup = () => {
     Network.init();
     Annotations.init();
     XRModule.init();
+    Help.init(Help.VISITOR_SECTIONS);
 };
 
 APP.update = () => {

@@ -43,3 +43,135 @@
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
+
+/* ── Bouton d'aide (dans #controls-bar, suit le style ctrl-btn) ──────────── */
+#help-btn { /* style hérité de .ctrl-btn — aucune surcharge nécessaire */ }
+
+/* ── Modale d'aide ───────────────────────────────────────────────────────── */
+#help-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  z-index: 400;
+  align-items: center;
+  justify-content: center;
+}
+#help-overlay.open { display: flex; }
+
+#help-modal {
+  background: #13131e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  width: 92%;
+  max-width: 520px;
+  max-height: 82vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+  font-family: var(--font);
+}
+
+.help-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+.help-title {
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.03em;
+}
+.help-close {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 1.2rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 0.1rem;
+  transition: color 0.15s;
+}
+.help-close:hover { color: #fff; }
+
+.help-tabs {
+  display: flex;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+  overflow-x: auto;
+}
+.help-tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: rgba(255, 255, 255, 0.45);
+  padding: 0.55rem 1rem;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-family: var(--font);
+  white-space: nowrap;
+  transition: color 0.15s;
+}
+.help-tab:hover  { color: rgba(255, 255, 255, 0.8); }
+.help-tab.active {
+  color: var(--color-blue);
+  border-bottom-color: var(--color-blue);
+}
+
+.help-content {
+  overflow-y: auto;
+  padding: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+.help-content h3 {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 1rem;
+  margin-bottom: 0.4rem;
+}
+.help-content h3:first-child { margin-top: 0; }
+.help-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 0.25rem;
+}
+.help-content td {
+  padding: 0.3rem 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  vertical-align: top;
+}
+.help-content td:first-child {
+  color: rgba(255, 255, 255, 0.95);
+  white-space: nowrap;
+  padding-right: 1rem;
+  width: 55%;
+}
+.help-content p {
+  margin-bottom: 0.35rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+.help-note {
+  font-weight: 400;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: none;
+  letter-spacing: 0;
+}
+.help-intro {
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 0.6rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0.3rem;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.6) !important;
+}
