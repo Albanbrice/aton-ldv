@@ -117,7 +117,8 @@ const CACHING_OPT = {
 	maxage: "3h"
 };
 
-app.use('/', express.static(Core.DIR_PUBLIC, CACHING_OPT ));
+// dotfiles: 'allow' nécessaire pour exposer /.well-known/ (ex: assetlinks.json pour TWA)
+app.use('/', express.static(Core.DIR_PUBLIC, { ...CACHING_OPT, dotfiles: 'allow' } ));
 
 // Official front-end (Hathor)
 //app.use('/fe', express.static(Core.DIR_FE));

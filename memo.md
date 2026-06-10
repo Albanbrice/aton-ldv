@@ -146,6 +146,24 @@ UI.fadeInMainElements = () => {
 
 ---
 
+## Patch services/ATON.service.main.js — à ré-appliquer après chaque `git merge upstream`
+
+`express.static` ignore par défaut les fichiers/dossiers commençant par un point (`dotfiles: 'ignore'`),
+donc `public/.well-known/assetlinks.json` (Digital Asset Links, requis pour la TWA Bubblewrap)
+n'était jamais servi malgré que `Core.DIR_PUBLIC` soit monté à la racine `/`.
+
+**Fichier : `services/ATON.service.main.js`**, juste avant le montage de `Core.DIR_PUBLIC` :
+
+```js
+// dotfiles: 'allow' nécessaire pour exposer /.well-known/ (ex: assetlinks.json pour TWA)
+app.use('/', express.static(Core.DIR_PUBLIC, { ...CACHING_OPT, dotfiles: 'allow' } ));
+```
+
+> Aucun rebuild de bundle nécessaire. Redémarrer le service principal (`npm start` / pm2 restart)
+> pour appliquer le changement.
+
+---
+
 ## Git
 
 ```bash
