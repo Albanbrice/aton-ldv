@@ -67,7 +67,7 @@ const TERRAIN_NODES      = ["etat-actuel", "restitution-XIIIe"]; // priorité de
 
 Plancher : raycast vers le bas sur le premier nœud terrain visible + `FLOOR_OFFSET`.
 Plafond : terrain + `FLOOR_OFFSET` + `CEILING_HEIGHT`.
-Plancher mis à jour à `XRstart` et 50ms après chaque téléportation (`XRselectEnd`).
+Plancher mis à jour à l'entrée en XR (`XRmode`) et 50ms après chaque téléportation (`XRselectEnd`).
 
 ## Événements Photon (canal `landevennec`)
 
@@ -109,8 +109,11 @@ Le `ThreeMeshUI.Block` du core est figé à `width:0.2 height:0.05`. On appelle 
 **DOM invisible en `immersive-vr`**
 Les interfaces HTML (`control.html`, `control3d.html`) ne sont pas visibles dans le casque. Le contrôle médiateur en VR se fait depuis une tablette ou un PC — pas de panneau 3D (SUI) pour les contrôles médiateur.
 
-**Reset rotation au `XRselectStart` — désactivé pour le médiateur**
-Pour les visiteurs, chaque téléportation réinitialise `rig.rotation` à `(0,0,0)` (évite le décalage angulaire post-snap). Pour le médiateur, ce reset est désactivé via `setResetRotationOnTeleport(false)` : sans cela, chaque pression de gâchette effaçait silencieusement les snaps accumulés.
+**Reset rotation sur téléportation imposée par le médiateur (`resetRigRotation`)**
+La téléportation par gâchette (visiteur en visite libre, ou médiateur) ne réinitialise jamais `rig.rotation` : elle se comporte comme le médiateur, qui a toujours conservé sa rotation snap entre téléportations. En revanche, lorsqu'une vue est imposée par le médiateur (`GOTO_POV` / `GOTO_POV_RAW`, reçue côté visiteur ou suivie côté médiateur 3D), `XRModule.resetRigRotation()` remet `rig.rotation` à `(0,0,0)` : une orientation snap héritée de l'ancien emplacement n'a plus lieu d'être dans la nouvelle vue.
+
+**`ATON.on("XRmode", ...)` et non `"XRstart"`/`"XRend"`**
+Le core ATON ne fire jamais ces deux événements (ils n'existent dans aucune version) ; seul `"XRmode"` (booléen `true`/`false` à l'entrée/sortie de la session XR) est émis. Les anciens handlers `XRstart`/`XRend` ne s'exécutaient donc jamais — notamment `ATON.Nav.setUserControl(_bTeleportEnabled)`, ce qui rendait la téléportation par gâchette toujours active même en visite guidée, malgré `_bTeleportEnabled = false`.
 
 **Plancher altitude terrain-aware**
 `rig.position.y` dans ATON = hauteur des yeux (pas des pieds). `_getTerrainY()` lance un raycast one-shot vers le bas sur le premier nœud terrain visible. Le résultat est additionné de `FLOOR_OFFSET` (1.7m) pour que le plancher corresponde à la hauteur debout, pas au sol visuel.

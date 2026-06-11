@@ -20,7 +20,6 @@ APP.setup = () => {
 
     // Le médiateur navigue toujours librement et conserve sa rotation snap entre téléportations
     XRModule.setTeleportEnabled(true);
-    XRModule.setResetRotationOnTeleport(false);
     Help.init(Help.MEDIATOR_SECTIONS);
 
     _initPhoton();
@@ -114,6 +113,7 @@ function _buildPOVButtons() {
         btn.textContent = pov.label;
         btn.addEventListener("click", () => {
             ATON.Photon.fire("GOTO_POV", { id: pov.id });
+            XRModule.resetRigRotation();
             ATON.Nav.requestPOVbyID(pov.id, PovTransition.getDuration()); // médiateur suit aussi
             flash(btn);
             UI.toast("Vue : " + pov.label);

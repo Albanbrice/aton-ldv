@@ -6,6 +6,7 @@ const Network = (() => {
         // Navigation vers un point de vue nommé
         ATON.Photon.on("GOTO_POV", (d) => {
             if (!d?.id) return;
+            XRModule.resetRigRotation();
             ATON.Nav.requestPOVbyID(d.id, PovTransition.getDuration());
             UI.toast("Vue : " + d.id);
         });
@@ -49,6 +50,7 @@ const Network = (() => {
                 .setPosition(d.pos[0],    d.pos[1],    d.pos[2])
                 .setTarget(  d.target[0], d.target[1], d.target[2])
                 .setFOV(d.fov || ATON.Nav.STD_FOV);
+            XRModule.resetRigRotation();
             ATON.Nav.requestPOV(pov, PovTransition.getDuration());
             UI.toast("Vue du médiateur");
         });

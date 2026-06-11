@@ -18,13 +18,12 @@ const XRModule = (() => {
   // ── État interne ──────────────────────────────────────────────────────────
 
   let _bTeleportEnabled = false; // guidée par défaut
-  let _bResetRotOnTeleport = true; // false pour le médiateur (évite d'effacer les snaps accumulés)
   let _stickArmed = true; // thumbstick prêt à déclencher (reset au neutre)
   let _stickYArmed = true; // axe Y — armement indépendant de l'axe X
   let _snapCooldown = false; // verrou partagé boutons + swipes
   let _prevLX = null; // position X gauche frame précédente (swipe horizontal)
   let _prevLY = null; // position Y gauche frame précédente (swipe vertical)
-  let _floorY = 0; // plancher dynamique — mis à jour au XRstart et à chaque téléport
+  let _floorY = 0; // plancher dynamique — mis à jour à l'entrée en XR et à chaque téléport
 
   // Pré-alloués pour le raycast terrain — aucune allocation par appel
   const _rigQ = new THREE.Quaternion();
@@ -35,33 +34,22 @@ const XRModule = (() => {
   // ── Init ──────────────────────────────────────────────────────────────────
 
   function init() {
-    ATON.on("XRstart", () => {
-      document.getElementById("ui-overlay")?.classList.add("xr-active");
-      ATON.XR.setupControllerUI();
-      ATON.Nav.setFirstPersonControl();
-      ATON.Nav.setUserControl(_bTeleportEnabled);
-      _floorY = ATON.XR.rig.position.y; // capture le sol au démarrage de la session
-      _stickArmed = true;
-      _stickYArmed = true;
-      _snapCooldown = false;
-      _prevLX = null;
-      _prevLY = null;
-    });
-
-    ATON.on("XRend", () => {
-      document.getElementById("ui-overlay")?.classList.remove("xr-active");
-      ATON.Nav.setUserControl(true);
-      _prevLX = null;
-    });
-
-    // Réinitialise la rotation virtuelle du rig à chaque téléportation.
-    // La téléportation repositionne le rig mais ne touche pas sa rotation —
-    // sans ce reset, les snaps précédents créent un décalage angulaire persistant.
-    ATON.on("XRselectStart", (hand) => {
-      if (hand !== ATON.XR.HAND_R) return;
-      if (!_bTeleportEnabled) return;
-      if (!_bResetRotOnTeleport) return; // médiateur : conserve la rotation snap
-      ATON.XR.rig.rotation.set(0, 0, 0);
+    // Le core ATON ne fire jamais "XRstart"/"XRend" — seul "XRmode" (bool) existe.
+    ATON.on("XRmode", (active) => {
+      if (active) {
+        document.getElementById("ui-overlay")?.classList.add("xr-active");
+        ATON.Nav.setUserControl(_bTeleportEnabled);
+        _floorY = ATON.XR.rig.position.y; // capture le sol au démarrage de la session
+        _stickArmed = true;
+        _stickYArmed = true;
+        _snapCooldown = false;
+        _prevLX = null;
+        _prevLY = null;
+      } else {
+        document.getElementById("ui-overlay")?.classList.remove("xr-active");
+        ATON.Nav.setUserControl(true);
+        _prevLX = null;
+      }
     });
 
     // Met à jour le plancher après chaque téléportation.
@@ -81,7 +69,12 @@ const XRModule = (() => {
   function update() {
     _updateAvatarCulling(); // actif en VR et en vue 3D standard
     if (!ATON.XR.isPresenting()) return;
-    _updateSnap();
+    // Réapplique le verrou à chaque frame : robuste si Nav._bControl est
+    // réinitialisé ailleurs dans le core entre l'entrée en XR et la 1ère frame.
+    ATON.Nav.setUserControl(_bTeleportEnabled);
+    // Rotation/altitude snap suivent le même verrou que la téléportation :
+    // en visite guidée (par défaut), le visiteur ne doit avoir aucun déplacement libre.
+    if (_bTeleportEnabled) _updateSnap();
     _fixInfoNodeOrientation();
   }
 
@@ -269,15 +262,20 @@ const XRModule = (() => {
     UI.toast(enabled ? "Navigation libre activée" : "Navigation guidée");
   }
 
-  function setResetRotationOnTeleport(enabled) {
-    _bResetRotOnTeleport = enabled;
+  // Réinitialise la rotation virtuelle du rig (snaps accumulés).
+  // À appeler lors d'une téléportation imposée par le médiateur (GOTO_POV /
+  // GOTO_POV_RAW) : la nouvelle vue est définie par sa propre cible, une
+  // orientation snap héritée de l'ancien emplacement n'a plus lieu d'être.
+  function resetRigRotation() {
+    if (!ATON.XR.isPresenting()) return;
+    ATON.XR.rig.rotation.set(0, 0, 0);
   }
 
   return {
     init,
     update,
     setTeleportEnabled,
-    setResetRotationOnTeleport,
+    resetRigRotation,
     ANNO_LABEL_T,
   };
 })();
