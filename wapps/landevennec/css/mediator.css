@@ -198,6 +198,28 @@
   color: var(--color-green);
 }
 
+/* ── Transition POV en VR ────────────────────────────────────────────────── */
+#btn-med-pov-transition {
+  width: 100%;
+  height: 46px;
+  margin-top: 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(58, 123, 213, 0.35);
+  background: rgba(58, 123, 213, 0.1);
+  color: var(--color-blue);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  letter-spacing: 0.02em;
+}
+#btn-med-pov-transition:hover { background: rgba(58, 123, 213, 0.2); }
+#btn-med-pov-transition.smooth {
+  border-color: rgba(167, 139, 250, 0.4);
+  background: rgba(167, 139, 250, 0.12);
+  color: var(--color-purple);
+}
+
 /* ── Calques visiteurs ───────────────────────────────────────────────────── */
 #btn-med-layers-unlock {
   width: 100%;

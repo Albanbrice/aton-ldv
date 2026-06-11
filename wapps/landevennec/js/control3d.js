@@ -56,6 +56,13 @@ function _initPhoton() {
         _syncNavToggle(d.enabled);
     });
 
+    // Synchroniser le bouton de transition POV si un autre médiateur a modifié l'état
+    ATON.Photon.on("POV_TRANSITION_MODE", (d) => {
+        if (!d?.mode) return;
+        PovTransition.setMode(d.mode);
+        _syncPovTransitionToggle(d.mode);
+    });
+
     // Message reçu
     ATON.Photon.on("BROADCAST", (d) => {
         if (!d?.text) return;
@@ -92,6 +99,7 @@ function _buildMediatorPanel() {
     _buildLayerToggles();
     _buildSharePOV();
     _buildNavToggle();
+    _buildPovTransitionToggle();
     _buildLayersUnlockToggle();
     _buildMessageInput();
     _buildPanelToggle();
@@ -106,7 +114,7 @@ function _buildPOVButtons() {
         btn.textContent = pov.label;
         btn.addEventListener("click", () => {
             ATON.Photon.fire("GOTO_POV", { id: pov.id });
-            ATON.Nav.requestPOVbyID(pov.id, 2.0); // médiateur suit aussi
+            ATON.Nav.requestPOVbyID(pov.id, PovTransition.getDuration()); // médiateur suit aussi
             flash(btn);
             UI.toast("Vue : " + pov.label);
         });
@@ -173,6 +181,31 @@ function _syncNavToggle(enabled) {
     } else {
         btn.textContent = "🔒 Visite guidée — téléportation bloquée";
         btn.classList.remove("free");
+    }
+}
+
+function _buildPovTransitionToggle() {
+    const btn = document.getElementById("btn-med-pov-transition");
+    if (!btn) return;
+    btn.addEventListener("click", () => {
+        const mode = PovTransition.getMode() === "teleport" ? "smooth" : "teleport";
+        PovTransition.setMode(mode);
+        ATON.Photon.fire("POV_TRANSITION_MODE", { mode });
+        _syncPovTransitionToggle(mode);
+        flash(btn);
+    });
+    _syncPovTransitionToggle(PovTransition.getMode());
+}
+
+function _syncPovTransitionToggle(mode) {
+    const btn = document.getElementById("btn-med-pov-transition");
+    if (!btn) return;
+    if (mode === "smooth") {
+        btn.textContent = "🌊 Changements de vue VR — transition progressive";
+        btn.classList.add("smooth");
+    } else {
+        btn.textContent = "📍 Changements de vue VR — téléportation directe";
+        btn.classList.remove("smooth");
     }
 }
 

@@ -71,6 +71,10 @@ const Help = (() => {
     <h3>Navigation des visiteurs</h3>
     <p>Bascule entre <strong>visite guidée</strong> (téléportation bloquée — défaut)
        et <strong>visite libre</strong> (déplacement autonome autorisé).</p>
+    <h3>Changements de vue en VR</h3>
+    <p>Bascule, pour les casques connectés, entre <strong>téléportation directe</strong>
+       (changement de vue instantané — défaut) et <strong>transition progressive</strong>
+       (déplacement fluide, comme en navigateur). N'affecte que le mode immersif.</p>
     <h3>Exploration des calques</h3>
     <p>Autorise les visiteurs à activer eux-mêmes les calques depuis leur casque.
        À utiliser lors des phases d'exploration autonome.</p>

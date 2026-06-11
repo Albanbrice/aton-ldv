@@ -57,6 +57,7 @@ function _buildUI() {
   _buildPOVButtons();
   _buildLayerToggles();
   _buildNavToggle();
+  _buildPovTransitionToggle();
   _buildLayersUnlockToggle();
   _buildMessageInput();
 }
@@ -110,6 +111,40 @@ function _buildNavToggle() {
     }
     flash(btn);
   });
+}
+
+function _buildPovTransitionToggle() {
+  const btn = document.getElementById("btn-pov-transition");
+  if (!btn) return;
+
+  // Synchronisation si un autre médiateur change l'état
+  ATON.Photon.on("POV_TRANSITION_MODE", (d) => {
+    if (!d?.mode) return;
+    PovTransition.setMode(d.mode);
+    _syncPovTransitionToggle(d.mode);
+  });
+
+  btn.addEventListener("click", () => {
+    const mode = PovTransition.getMode() === "teleport" ? "smooth" : "teleport";
+    PovTransition.setMode(mode);
+    ATON.Photon.fire("POV_TRANSITION_MODE", { mode });
+    _syncPovTransitionToggle(mode);
+    flash(btn);
+  });
+
+  _syncPovTransitionToggle(PovTransition.getMode());
+}
+
+function _syncPovTransitionToggle(mode) {
+  const btn = document.getElementById("btn-pov-transition");
+  if (!btn) return;
+  if (mode === "smooth") {
+    btn.textContent = "🌊 Changements de vue VR — transition progressive";
+    btn.classList.add("smooth");
+  } else {
+    btn.textContent = "📍 Changements de vue VR — téléportation directe";
+    btn.classList.remove("smooth");
+  }
 }
 
 function _buildLayersUnlockToggle() {

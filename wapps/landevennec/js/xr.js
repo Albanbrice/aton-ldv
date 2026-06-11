@@ -7,30 +7,30 @@ const XRModule = (() => {
   const SNAP_COOLDOWN = 350; // ms — délai minimum entre deux snaps (boutons/swipe)
   const SWIPE_THRESHOLD = 0.012; // m/frame — vitesse minimale pour un swipe intentionnel (≈0.87 m/s à 72fps)
   const SWIPE_ON_PRIMARY = false; // true = main droite (téléportation) ; false = main gauche (joystick / X·Y)
-  const AVATAR_CULL_RADIUS = 0.5; // m — avatars trop proches masqués localement
+  const AVATAR_CULL_RADIUS = 1; // m — avatars trop proches masqués localement
   const ANNO_LABEL_T = 0.5; // 0..1 — position du label entre annotation (0) et œil (1)
-  const ALTITUDE_STEP   = 2;   // m par snap vertical (thumbstick Y gauche)
-  const FLOOR_OFFSET    = 1.7; // m — hauteur œil au-dessus du terrain (rig.y = hauteur yeux dans ATON)
-  const CEILING_HEIGHT  = 30;  // m au-dessus du sol — plafond maximal pour éviter de perdre les visiteurs
+  const ALTITUDE_STEP = 2; // m par snap vertical (thumbstick Y gauche)
+  const FLOOR_OFFSET = 1.7; // m — hauteur œil au-dessus du terrain (rig.y = hauteur yeux dans ATON)
+  const CEILING_HEIGHT = 30; // m au-dessus du sol — plafond maximal pour éviter de perdre les visiteurs
   // Nœuds terrain par ordre de priorité — le premier visible sert de référence
-  const TERRAIN_NODES   = ["etat-actuel", "restitution-XIIIe"];
+  const TERRAIN_NODES = ["etat-actuel", "restitution-XIIIe"];
 
   // ── État interne ──────────────────────────────────────────────────────────
 
-  let _bTeleportEnabled  = false; // guidée par défaut
-  let _bResetRotOnTeleport = true;  // false pour le médiateur (évite d'effacer les snaps accumulés)
-  let _stickArmed  = true;  // thumbstick prêt à déclencher (reset au neutre)
-  let _stickYArmed = true;  // axe Y — armement indépendant de l'axe X
+  let _bTeleportEnabled = false; // guidée par défaut
+  let _bResetRotOnTeleport = true; // false pour le médiateur (évite d'effacer les snaps accumulés)
+  let _stickArmed = true; // thumbstick prêt à déclencher (reset au neutre)
+  let _stickYArmed = true; // axe Y — armement indépendant de l'axe X
   let _snapCooldown = false; // verrou partagé boutons + swipes
   let _prevLX = null; // position X gauche frame précédente (swipe horizontal)
   let _prevLY = null; // position Y gauche frame précédente (swipe vertical)
-  let _floorY = 0;   // plancher dynamique — mis à jour au XRstart et à chaque téléport
+  let _floorY = 0; // plancher dynamique — mis à jour au XRstart et à chaque téléport
 
   // Pré-alloués pour le raycast terrain — aucune allocation par appel
-  const _rigQ       = new THREE.Quaternion();
-  const _raycaster  = new THREE.Raycaster();
-  const _rayDown    = new THREE.Vector3(0, -1, 0);
-  const _rayOrigin  = new THREE.Vector3();
+  const _rigQ = new THREE.Quaternion();
+  const _raycaster = new THREE.Raycaster();
+  const _rayDown = new THREE.Vector3(0, -1, 0);
+  const _rayOrigin = new THREE.Vector3();
 
   // ── Init ──────────────────────────────────────────────────────────────────
 
@@ -70,7 +70,9 @@ const XRModule = (() => {
     ATON.on("XRselectEnd", (hand) => {
       if (hand !== ATON.XR.HAND_R) return;
       if (!_bTeleportEnabled) return;
-      setTimeout(() => { _floorY = ATON.XR.rig.position.y; }, 50);
+      setTimeout(() => {
+        _floorY = ATON.XR.rig.position.y;
+      }, 50);
     });
   }
 
@@ -141,7 +143,9 @@ const XRModule = (() => {
 
   function _cooldown() {
     _snapCooldown = true;
-    setTimeout(() => { _snapCooldown = false; }, SNAP_COOLDOWN);
+    setTimeout(() => {
+      _snapCooldown = false;
+    }, SNAP_COOLDOWN);
   }
 
   // Retourne le Y du terrain sous le rig via raycast vers le bas.
@@ -151,7 +155,10 @@ const XRModule = (() => {
     let terrainNode = null;
     for (const name of TERRAIN_NODES) {
       const n = ATON.getSceneNode(name);
-      if (n?.visible) { terrainNode = n; break; }
+      if (n?.visible) {
+        terrainNode = n;
+        break;
+      }
     }
     if (!terrainNode) return _floorY;
 
@@ -185,8 +192,13 @@ const XRModule = (() => {
       if (Math.abs(ax.y) < 0.2) {
         _stickYArmed = true;
       } else if (_stickYArmed) {
-        if (ax.y > 0.7)       { _snapAltitude(+1); _stickYArmed = false; }
-        else if (ax.y < -0.7) { _snapAltitude(-1); _stickYArmed = false; }
+        if (ax.y > 0.7) {
+          _snapAltitude(+1);
+          _stickYArmed = false;
+        } else if (ax.y < -0.7) {
+          _snapAltitude(-1);
+          _stickYArmed = false;
+        }
       }
     }
 
@@ -220,8 +232,13 @@ const XRModule = (() => {
       const lx = ctrl.position.x;
       if (_prevLX !== null && !_snapCooldown) {
         const dx = lx - _prevLX;
-        if (dx > SWIPE_THRESHOLD)       { _snap(-1); _cooldown(); }
-        else if (dx < -SWIPE_THRESHOLD) { _snap(+1); _cooldown(); }
+        if (dx > SWIPE_THRESHOLD) {
+          _snap(-1);
+          _cooldown();
+        } else if (dx < -SWIPE_THRESHOLD) {
+          _snap(+1);
+          _cooldown();
+        }
       }
       _prevLX = lx;
 
@@ -229,8 +246,13 @@ const XRModule = (() => {
       const ly = ctrl.position.y;
       if (_prevLY !== null && !_snapCooldown) {
         const dy = ly - _prevLY;
-        if (dy > SWIPE_THRESHOLD)       { _snapAltitude(+1); _cooldown(); }
-        else if (dy < -SWIPE_THRESHOLD) { _snapAltitude(-1); _cooldown(); }
+        if (dy > SWIPE_THRESHOLD) {
+          _snapAltitude(+1);
+          _cooldown();
+        } else if (dy < -SWIPE_THRESHOLD) {
+          _snapAltitude(-1);
+          _cooldown();
+        }
       }
       _prevLY = ly;
     } else {
@@ -251,5 +273,11 @@ const XRModule = (() => {
     _bResetRotOnTeleport = enabled;
   }
 
-  return { init, update, setTeleportEnabled, setResetRotationOnTeleport, ANNO_LABEL_T };
+  return {
+    init,
+    update,
+    setTeleportEnabled,
+    setResetRotationOnTeleport,
+    ANNO_LABEL_T,
+  };
 })();

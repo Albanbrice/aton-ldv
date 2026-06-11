@@ -7,6 +7,32 @@ function flash(el) {
     setTimeout(() => el.classList.remove("flash"), 600);
 }
 
+// ── Mode de transition entre POVs en mode XR ──────────────────────────────────
+// Partagé entre les 3 interfaces : "teleport" (instantané) ou "smooth" (progressif).
+// Ne s'applique qu'en session XR ; en navigation web, getDuration() renvoie
+// toujours la durée progressive standard.
+const PovTransition = (() => {
+    let _mode = XR_POV_TRANSITION_DEFAULT;
+
+    function setMode(mode) {
+        if (mode !== "teleport" && mode !== "smooth") return;
+        _mode = mode;
+    }
+
+    function getMode() {
+        return _mode;
+    }
+
+    function getDuration() {
+        if (!ATON.XR.isPresenting()) return POV_TRANSITION_DURATION_SMOOTH;
+        return _mode === "teleport"
+            ? POV_TRANSITION_DURATION_TELEPORT
+            : POV_TRANSITION_DURATION_SMOOTH;
+    }
+
+    return { setMode, getMode, getDuration };
+})();
+
 // ── Construction générique des lignes de calques ──────────────────────────────
 // containerId : ID du conteneur <div> liste
 // classes     : { row, label, toggle } — noms de classes CSS (varient par interface)
