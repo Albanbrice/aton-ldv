@@ -113,7 +113,7 @@ function _buildPOVButtons() {
         btn.textContent = pov.label;
         btn.addEventListener("click", () => {
             ATON.Photon.fire("GOTO_POV", { id: pov.id });
-            XRModule.resetRigRotation();
+            XRModule.alignRigToPOV(ATON.Nav.getPOV(pov.id));
             ATON.Nav.requestPOVbyID(pov.id, PovTransition.getDuration()); // médiateur suit aussi
             flash(btn);
             UI.toast("Vue : " + pov.label);

@@ -24,6 +24,10 @@ const XRModule = (() => {
   let _prevLX = null; // position X gauche frame précédente (swipe horizontal)
   let _prevLY = null; // position Y gauche frame précédente (swipe vertical)
   let _floorY = 0; // plancher dynamique — mis à jour à l'entrée en XR et à chaque téléport
+  let _wasPresenting = false; // détecte la transition non-XR -> XR et XR -> non-XR (cf. note "XRmode" cassé)
+  let _pendingAlign = null; // {dx,dz} direction cible à appliquer dès que Nav._vDir est valide en XR
+  let _initialVDir = null; // {x,z} Nav._vDir capturé à l'entrée XR (direction desktop, pas encore resynchronisée)
+  let _alignFrameCountdown = 0; // frames restantes avant d'abandonner l'attente et appliquer quand même
 
   // Pré-alloués pour le raycast terrain — aucune allocation par appel
   const _rigQ = new THREE.Quaternion();
@@ -34,23 +38,12 @@ const XRModule = (() => {
   // ── Init ──────────────────────────────────────────────────────────────────
 
   function init() {
-    // Le core ATON ne fire jamais "XRstart"/"XRend" — seul "XRmode" (bool) existe.
-    ATON.on("XRmode", (active) => {
-      if (active) {
-        document.getElementById("ui-overlay")?.classList.add("xr-active");
-        ATON.Nav.setUserControl(_bTeleportEnabled);
-        _floorY = ATON.XR.rig.position.y; // capture le sol au démarrage de la session
-        _stickArmed = true;
-        _stickYArmed = true;
-        _snapCooldown = false;
-        _prevLX = null;
-        _prevLY = null;
-      } else {
-        document.getElementById("ui-overlay")?.classList.remove("xr-active");
-        ATON.Nav.setUserControl(true);
-        _prevLX = null;
-      }
-    });
+    // ATON.fire("XRmode", ...) existe bien dans le core (ATON.xr.js), mais le
+    // handler enregistré par ATON.MRes (ATON.mres.js) appelle TS.setXRSession(...)
+    // qui n'existe pas dans cette version → TypeError non rattrapée qui casse
+    // la chaîne de handlers AVANT que le nôtre ne soit appelé. "XRmode" n'est
+    // donc jamais reçu ici. On détecte à la place la transition de présence XR
+    // par scrutation dans update() (cf. _onXRStart/_onXRExit).
 
     // Met à jour le plancher après chaque téléportation.
     // ATON déplace le rig sur XRselectEnd (relâchement gâchette) — le délai
@@ -64,11 +57,53 @@ const XRModule = (() => {
     });
   }
 
+  // ── Transitions de session XR (détectées par scrutation, cf. note init()) ──
+
+  function _onXRStart() {
+    document.getElementById("ui-overlay")?.classList.add("xr-active");
+    ATON.Nav.setUserControl(_bTeleportEnabled);
+    // Oriente le rig vers la cible du POV courant : sans cela, le rig
+    // démarre avec une rotation nulle et le visiteur regarde toujours
+    // dans la direction "par défaut" (nord), quel que soit le POV affiché.
+    // Reporté le temps que Nav._vDir reflète la pose réelle du casque
+    // (cf. update()).
+    const cpov = ATON.Nav._currPOV;
+    if (cpov?.pos && cpov?.target) {
+      _pendingAlign = {
+        dx: cpov.target.x - cpov.pos.x,
+        dz: cpov.target.z - cpov.pos.z,
+      };
+      const v = ATON.Nav._vDir;
+      _initialVDir = v ? { x: v.x, z: v.z } : null;
+      _alignFrameCountdown = 90; // ~1.25s à 72fps — garde-fou si vDir ne change jamais
+    }
+    _floorY = ATON.XR.rig.position.y; // capture le sol au démarrage de la session
+    _stickArmed = true;
+    _stickYArmed = true;
+    _snapCooldown = false;
+    _prevLX = null;
+    _prevLY = null;
+  }
+
+  function _onXRExit() {
+    document.getElementById("ui-overlay")?.classList.remove("xr-active");
+    ATON.Nav.setUserControl(true);
+    _prevLX = null;
+    _pendingAlign = null;
+    _initialVDir = null;
+  }
+
   // ── Boucle principale ─────────────────────────────────────────────────────
 
   function update() {
     _updateAvatarCulling(); // actif en VR et en vue 3D standard
-    if (!ATON.XR.isPresenting()) return;
+
+    const presenting = ATON.XR.isPresenting();
+    if (presenting && !_wasPresenting) _onXRStart();
+    else if (!presenting && _wasPresenting) _onXRExit();
+    _wasPresenting = presenting;
+
+    if (!presenting) return;
     // Réapplique le verrou à chaque frame : robuste si Nav._bControl est
     // réinitialisé ailleurs dans le core entre l'entrée en XR et la 1ère frame.
     ATON.Nav.setUserControl(_bTeleportEnabled);
@@ -76,6 +111,23 @@ const XRModule = (() => {
     // en visite guidée (par défaut), le visiteur ne doit avoir aucun déplacement libre.
     if (_bTeleportEnabled) _updateSnap();
     _fixInfoNodeOrientation();
+
+    // Orientation initiale du rig, reportée le temps que Nav._vDir reflète
+    // la pose réelle du casque (et non plus la direction de la vue desktop).
+    if (_pendingAlign) {
+      const v = ATON.Nav._vDir;
+      const changed =
+        v &&
+        _initialVDir &&
+        (Math.abs(v.x - _initialVDir.x) > 1e-4 ||
+          Math.abs(v.z - _initialVDir.z) > 1e-4);
+      _alignFrameCountdown--;
+      if (changed || !_initialVDir || _alignFrameCountdown <= 0) {
+        _applyYawToFace(_pendingAlign.dx, _pendingAlign.dz);
+        _pendingAlign = null;
+        _initialVDir = null;
+      }
+    }
   }
 
   // ── Masquage local des avatars trop proches ───────────────────────────────
@@ -262,20 +314,41 @@ const XRModule = (() => {
     UI.toast(enabled ? "Navigation libre activée" : "Navigation guidée");
   }
 
-  // Réinitialise la rotation virtuelle du rig (snaps accumulés).
-  // À appeler lors d'une téléportation imposée par le médiateur (GOTO_POV /
-  // GOTO_POV_RAW) : la nouvelle vue est définie par sa propre cible, une
-  // orientation snap héritée de l'ancien emplacement n'a plus lieu d'être.
-  function resetRigRotation() {
+  // Tourne le rig (rotation Y uniquement) pour que la direction de vue
+  // actuelle du casque (Nav._vDir, repère local au rig — cf. note ci-dessous)
+  // pointe vers (dx,dz) en coordonnées scène (Y = altitude).
+  //
+  // Nav._vDir est calculé via xrcam.getWorldDirection() où xrcam (cameras[0])
+  // n'a pas de parent dans le graphe de scène : c'est donc la direction de
+  // visée du casque dans son propre repère local, indépendante de
+  // rig.rotation. Le rendu réel applique rig.rotation à cette direction
+  // locale (cameraXR.matrixWorld = rig.matrixWorld * device.matrix). On en
+  // déduit l'angle de rotation absolu à appliquer au rig pour que la
+  // direction rendue corresponde à (dx,dz).
+  function _applyYawToFace(dx, dz) {
+    const cur = ATON.Nav._vDir;
+    if (!cur) return;
+    if (dx === 0 && dz === 0) return;
+    if (cur.x === 0 && cur.z === 0) return;
+    const aCur = Math.atan2(cur.z, cur.x);
+    const aDes = Math.atan2(dz, dx);
+    ATON.XR.rig.rotation.y = aCur - aDes;
+  }
+
+  // Réoriente le rig sur la cible d'un POV imposé par le médiateur (GOTO_POV
+  // / GOTO_POV_RAW) : une orientation snap héritée de l'ancien emplacement
+  // n'a plus lieu d'être dans la nouvelle vue.
+  function alignRigToPOV(pov) {
     if (!ATON.XR.isPresenting()) return;
-    ATON.XR.rig.rotation.set(0, 0, 0);
+    if (!pov?.pos || !pov?.target) return;
+    _applyYawToFace(pov.target.x - pov.pos.x, pov.target.z - pov.pos.z);
   }
 
   return {
     init,
     update,
     setTeleportEnabled,
-    resetRigRotation,
+    alignRigToPOV,
     ANNO_LABEL_T,
   };
 })();

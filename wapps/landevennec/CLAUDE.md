@@ -109,11 +109,16 @@ Le `ThreeMeshUI.Block` du core est figé à `width:0.2 height:0.05`. On appelle 
 **DOM invisible en `immersive-vr`**
 Les interfaces HTML (`control.html`, `control3d.html`) ne sont pas visibles dans le casque. Le contrôle médiateur en VR se fait depuis une tablette ou un PC — pas de panneau 3D (SUI) pour les contrôles médiateur.
 
-**Reset rotation sur téléportation imposée par le médiateur (`resetRigRotation`)**
-La téléportation par gâchette (visiteur en visite libre, ou médiateur) ne réinitialise jamais `rig.rotation` : elle se comporte comme le médiateur, qui a toujours conservé sa rotation snap entre téléportations. En revanche, lorsqu'une vue est imposée par le médiateur (`GOTO_POV` / `GOTO_POV_RAW`, reçue côté visiteur ou suivie côté médiateur 3D), `XRModule.resetRigRotation()` remet `rig.rotation` à `(0,0,0)` : une orientation snap héritée de l'ancien emplacement n'a plus lieu d'être dans la nouvelle vue.
+**Orientation du rig (`alignRigToPOV` / `_applyYawToFace`)**
+En XR, `Nav.requestPOV` ne déplace que la position du rig (`XR.setRefSpaceLocation`) — l'orientation rendue est `rig.rotation ⊗ pose_casque_locale` (cf. `WebXRManager.updateCamera`, qui multiplie par `rig.matrixWorld`). Or `Nav._vDir`/`Nav._qOri` (utilisés pour la position/orientation de l'avatar broadcastée via Photon) viennent de `xrcam.getWorldDirection()`/`.quaternion` où `xrcam` (cameras[0]) **n'a pas de parent dans le graphe de scène** : ils représentent donc la pose locale du casque, *indépendante* de `rig.rotation`. C'est pourquoi l'avatar d'un visiteur en XR n'est pas forcément orienté comme ce qu'il voit réellement.
 
-**`ATON.on("XRmode", ...)` et non `"XRstart"`/`"XRend"`**
-Le core ATON ne fire jamais ces deux événements (ils n'existent dans aucune version) ; seul `"XRmode"` (booléen `true`/`false` à l'entrée/sortie de la session XR) est émis. Les anciens handlers `XRstart`/`XRend` ne s'exécutaient donc jamais — notamment `ATON.Nav.setUserControl(_bTeleportEnabled)`, ce qui rendait la téléportation par gâchette toujours active même en visite guidée, malgré `_bTeleportEnabled = false`.
+`_applyYawToFace(dx, dz)` (dans `xr.js`) exploite `Nav._vDir` comme mesure de la pose locale courante du casque, et calcule l'angle absolu `rig.rotation.y = atan2(vDir.z, vDir.x) - atan2(dz, dx)` pour que la direction *rendue* (rig.rotation appliqué à la pose locale) pointe vers `(dx, dz)`.
+
+- À l'entrée en XR (`XRmode`), on vise la cible du POV courant (`Nav._currPOV.target - Nav._currPOV.pos`). L'application est différée de 2 frames (`_pendingAlign`/`_alignFrameCountdown`, traité dans `update()`) le temps que `Nav._vDir` soit resynchronisé sur la pose XR réelle (juste après `XRmode`, il contient encore la direction de la caméra desktop).
+- Lors d'une téléportation imposée par le médiateur (`GOTO_POV` / `GOTO_POV_RAW`), `XRModule.alignRigToPOV(pov)` appelle `_applyYawToFace` immédiatement (Nav._vDir est déjà à jour en cours de session) : une orientation snap héritée de l'ancien emplacement n'a plus lieu d'être dans la nouvelle vue.
+
+**Détection de session XR par scrutation, et non via `"XRmode"`**
+`ATON.fire("XRmode", true/false)` existe bien dans le core (`ATON.xr.js`), mais le handler enregistré par `ATON.MRes` (`ATON.mres.js`) appelle `TS.setXRSession(...)`, méthode absente dans la version de Cesium 3D Tiles bundlée → `TypeError` non rattrapée qui interrompt la chaîne de handlers *avant* que le nôtre ne soit appelé. `"XRmode"` n'est donc **jamais reçu** côté wapp. À la place, `_onXRStart()`/`_onXRExit()` (dans `xr.js`) sont déclenchés par scrutation de `ATON.XR.isPresenting()` dans `update()` (transition `false→true` / `true→false`), ce qui est indépendant de cette chaîne d'événements cassée.
 
 **Plancher altitude terrain-aware**
 `rig.position.y` dans ATON = hauteur des yeux (pas des pieds). `_getTerrainY()` lance un raycast one-shot vers le bas sur le premier nœud terrain visible. Le résultat est additionné de `FLOOR_OFFSET` (1.7m) pour que le plancher corresponde à la hauteur debout, pas au sol visuel.
