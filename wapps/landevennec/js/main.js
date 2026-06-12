@@ -21,6 +21,7 @@ APP.setup = () => {
     Network.init();
     Annotations.init();
     XRModule.init();
+    RenderXray.init();
     Help.init(Help.VISITOR_SECTIONS);
 
     // Splash "toucher pour démarrer" quand lancé depuis la bibliothèque Quest (PWA)

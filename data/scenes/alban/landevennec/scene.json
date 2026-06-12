@@ -12,13 +12,23 @@
         ],
         "transform": { "scale": [1, 1, 1], "rotation": [-1.57079632679, 0, 0] }
       },
+      "restitution-XIIIe-transparence": {
+        "urls": ["alban/models/abbaye_001.glb", "alban/models/abbaye_005.glb"],
+        "show": false
+      },
       "restitution-XIIIe": {
         "urls": ["alban/models/abbaye_001.glb"],
         "show": false
       },
       "archives-photo": { "urls": [], "show": false }
     },
-    "edges": { ".": ["etat-actuel", "restitution-XIIIe"] }
+    "edges": {
+      ".": [
+        "etat-actuel",
+        "restitution-XIIIe-transparence",
+        "restitution-XIIIe"
+      ]
+    }
   },
   "viewpoints": {
     "home": {

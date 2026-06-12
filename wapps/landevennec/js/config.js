@@ -36,7 +36,7 @@ const LAYERS = [
   {
     node: "restitution-XIIIe-transparence",
     label: "Superposition de la restitution XIIIe s.",
-    visible: false,
+    visible: true,
   },
   { node: "restitution-XIIIe", label: "Restitution XIIIe s.", visible: false },
   { node: "archives-photo", label: "Photos d'archives", visible: false },
