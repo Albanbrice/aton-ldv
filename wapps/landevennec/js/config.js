@@ -39,5 +39,5 @@ const LAYERS = [
     visible: false,
   },
   { node: "restitution-XIIIe", label: "Restitution XIIIe s.", visible: false },
-  { node: "fragments", label: "Fragments", visible: false },
+  { node: "fragments", label: "Fragments architecturaux", visible: false },
 ];
