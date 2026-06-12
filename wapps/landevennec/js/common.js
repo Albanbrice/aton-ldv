@@ -33,6 +33,19 @@ const PovTransition = (() => {
     return { setMode, getMode, getDuration };
 })();
 
+// ── Application de l'état initial des calques ────────────────────────────────
+// `LAYERS[].visible` (config.js) est la source de vérité pour l'état initial,
+// indépendamment du flag "show" présent dans scene.json pour chaque nœud.
+function applyInitialLayerVisibility() {
+    ATON.on("AllNodeRequestsCompleted", () => {
+        LAYERS.forEach((layer) => {
+            const n = ATON.getSceneNode?.(layer.node);
+            if (!n) return;
+            layer.visible ? n.show() : n.hide();
+        });
+    });
+}
+
 // ── Construction générique des lignes de calques ──────────────────────────────
 // containerId : ID du conteneur <div> liste
 // classes     : { row, label, toggle } — noms de classes CSS (varient par interface)

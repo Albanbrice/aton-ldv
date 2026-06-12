@@ -13,6 +13,8 @@ APP.setup = () => {
     ATON.FE.loadSceneID(sid);
     ATON.Photon.connect(SESSION_ID);
 
+    applyInitialLayerVisibility();
+
     // Modules communs avec l'app visiteur
     UI.init();
     Annotations.init();

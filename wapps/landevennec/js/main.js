@@ -17,6 +17,7 @@ APP.setup = () => {
     ATON.FE.loadSceneID(sid);
     ATON.Photon.connect(SESSION_ID);
 
+    applyInitialLayerVisibility();
     UI.init();
     Network.init();
     Annotations.init();
