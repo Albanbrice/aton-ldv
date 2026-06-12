@@ -37,7 +37,11 @@ const PovTransition = (() => {
 // `LAYERS[].visible` (config.js) est la source de vérité pour l'état initial,
 // indépendamment du flag "show" présent dans scene.json pour chaque nœud.
 function applyInitialLayerVisibility() {
+    let bApplied = false;
     ATON.on("AllNodeRequestsCompleted", () => {
+        if (bApplied) return;
+        bApplied = true;
+
         LAYERS.forEach((layer) => {
             const n = ATON.getSceneNode?.(layer.node);
             if (!n) return;

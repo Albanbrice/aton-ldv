@@ -5,48 +5,51 @@
 let APP = ATON.App.realize();
 
 APP.setup = () => {
-    ATON.FE.realize();
-    ATON.FE.addBasicLoaderEvents();
-    ATON.XR.setSessionType("immersive-vr");
+  ATON.FE.realize();
+  ATON.FE.addBasicLoaderEvents();
+  ATON.XR.setSessionType("immersive-vr");
 
-    // 3D Tiles LOD quality for Meta Quest 3 (online: ~75% native 2064×2208)
-    // Core change needed: setXRResolution added to ATON.mres.js — re-apply after upstream pull
-    ATON.MRes.setXRResolution(1600, 1700);
+  // 3D Tiles LOD quality for Meta Quest 3 (online: ~75% native 2064×2208)
+  // Core change needed: setXRResolution added to ATON.mres.js — re-apply after upstream pull
+  ATON.MRes.setXRResolution(1600, 1700);
 
-    const sid = APP.params.get("s") || SCENE_DEFAULT;
-    ATON.FE.loadSceneID(sid);
-    ATON.Photon.connect(SESSION_ID);
+  const sid = APP.params.get("s") || SCENE_DEFAULT;
+  ATON.FE.loadSceneID(sid);
+  ATON.Photon.connect(SESSION_ID);
 
-    applyInitialLayerVisibility();
-    UI.init();
-    Network.init();
-    Annotations.init();
-    XRModule.init();
-    RenderXray.init();
-    RenderInstances.init();
-    Help.init(Help.VISITOR_SECTIONS);
+  applyInitialLayerVisibility();
+  UI.init();
+  Network.init();
+  Annotations.init();
+  XRModule.init();
+  RenderXray.init();
+  RenderInstances.init();
+  Help.init(Help.VISITOR_SECTIONS);
 
-    // Splash "toucher pour démarrer" quand lancé depuis la bibliothèque Quest (PWA)
-    // requestSession() exige un geste utilisateur — on le capture via le tap sur le splash.
-    const _bPWA = window.matchMedia('(display-mode: fullscreen)').matches
-               || window.matchMedia('(display-mode: standalone)').matches;
-    if (_bPWA) {
-        ATON.on("AllNodeRequestsCompleted", () => {
-            setTimeout(_showVRSplash, 300);
-        });
-    }
+  // Splash "toucher pour démarrer" quand lancé depuis la bibliothèque Quest (PWA)
+  // requestSession() exige un geste utilisateur — on le capture via le tap sur le splash.
+  const _bPWA =
+    window.matchMedia("(display-mode: fullscreen)").matches ||
+    window.matchMedia("(display-mode: standalone)").matches;
+  if (_bPWA) {
+    ATON.on("AllNodeRequestsCompleted", () => {
+      setTimeout(_showVRSplash, 300);
+    });
+  }
 };
 
 APP.update = () => {
-    XRModule.update();
+  XRModule.update();
 };
 
 function _showVRSplash() {
-    const sections = Help.VISITOR_SECTIONS.filter(s => s.label.startsWith("VR"));
+  const sections = Help.VISITOR_SECTIONS.filter((s) =>
+    s.label.startsWith("VR")
+  );
 
-    const splash = document.createElement("div");
-    splash.id = "vr-splash";
-    splash.innerHTML = `
+  const splash = document.createElement("div");
+  splash.id = "vr-splash";
+  splash.innerHTML = `
         <div id="vr-splash-header">
             <h1>Visite guidée</h1>
             <p>Abbaye de Landévennec</p>
@@ -64,28 +67,32 @@ function _showVRSplash() {
             </button>
         </div>`;
 
-    document.body.appendChild(splash);
+  document.body.appendChild(splash);
 
-    const tabBar  = splash.querySelector("#vr-splash-tabs");
-    const content = splash.querySelector("#vr-splash-content");
+  const tabBar = splash.querySelector("#vr-splash-tabs");
+  const content = splash.querySelector("#vr-splash-content");
 
-    content.innerHTML = sections[0].html;
-    sections.forEach((s, i) => {
-        const tab = document.createElement("button");
-        tab.className = "vr-splash-tab" + (i === 0 ? " active" : "");
-        tab.textContent = s.label.replace("VR — ", "");
-        tab.addEventListener("click", () => {
-            tabBar.querySelectorAll(".vr-splash-tab").forEach(t => t.classList.remove("active"));
-            tab.classList.add("active");
-            content.innerHTML = s.html;
-            content.scrollTop = 0;
-        });
-        tabBar.appendChild(tab);
+  content.innerHTML = sections[0].html;
+  sections.forEach((s, i) => {
+    const tab = document.createElement("button");
+    tab.className = "vr-splash-tab" + (i === 0 ? " active" : "");
+    tab.textContent = s.label.replace("VR — ", "");
+    tab.addEventListener("click", () => {
+      tabBar
+        .querySelectorAll(".vr-splash-tab")
+        .forEach((t) => t.classList.remove("active"));
+      tab.classList.add("active");
+      content.innerHTML = s.html;
+      content.scrollTop = 0;
     });
+    tabBar.appendChild(tab);
+  });
 
-    splash.querySelector("#vr-splash-btn").addEventListener("click", () => {
-        splash.classList.add("hiding");
-        splash.addEventListener("transitionend", () => splash.remove(), { once: true });
-        if (!ATON.XR.isPresenting()) ATON.XR.toggle("immersive-vr");
+  splash.querySelector("#vr-splash-btn").addEventListener("click", () => {
+    splash.classList.add("hiding");
+    splash.addEventListener("transitionend", () => splash.remove(), {
+      once: true,
     });
+    if (!ATON.XR.isPresenting()) ATON.XR.toggle("immersive-vr");
+  });
 }

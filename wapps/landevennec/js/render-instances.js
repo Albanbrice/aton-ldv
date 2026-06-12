@@ -4,7 +4,6 @@
 // claveaux, etc.) via THREE.InstancedMesh, à partir de listes de transforms
 // exportées depuis Blender.
 const RenderInstances = (() => {
-
   // ── Déclaration des groupes d'instances ──────────────────────────────────
   // Chaque entrée :
   //   url           : chemin du modèle source, relatif à la collection
@@ -16,12 +15,23 @@ const RenderInstances = (() => {
   //   rootTransform  : transform optionnelle appliquée au groupe entier
   //                    (ex: conversion Z-up Blender -> Y-up ATON, comme pour
   //                    le nœud "etat-actuel" dans scene.json).
+  //   layer          : optionnel — ID d'un nœud du scenegraph (ex:
+  //                    "restitution-XIIIe-transparence") auquel rattacher
+  //                    le groupe d'instances. Sa visibilité (show/hide,
+  //                    pilotée par LAYERS dans config.js) s'applique alors
+  //                    aussi aux instances. Si absent, le groupe est ajouté
+  //                    à la racine de la scène (toujours visible).
   const INSTANCE_GROUPS = [
-    // {
-    //   url: "alban/models/colonne_type1.glb",
-    //   rootTransform: { rotation: [-1.57079632679, 0, 0] },
-    //   transformsUrl: "data/instances-colonnes-type1.json",
-    // },
+    {
+      url: "alban/models/chapiteau_double.glb",
+      transformsUrl: "json/instances-cloitre-galeries.json",
+      layer: "restitution-XIIIe-transparence",
+    },
+    {
+      url: "alban/models/chapiteau_quadruple.glb",
+      transformsUrl: "json/instances-cloitre-chapiteau_quadruple.json",
+      layer: "restitution-XIIIe-transparence",
+    },
   ];
 
   let _bInitialized = false;
@@ -40,28 +50,50 @@ const RenderInstances = (() => {
   // ── Chargement d'un groupe ──────────────────────────────────────────────
 
   async function _loadGroup(group) {
-    const transforms = group.transforms || await _fetchTransforms(group.transformsUrl);
+    const transforms =
+      group.transforms || (await _fetchTransforms(group.transformsUrl));
     if (!transforms || transforms.length === 0) return;
+
+    const layerNode = group.layer && ATON.getSceneNode(group.layer);
+    const target = layerNode || ATON.getRootScene();
+
+    // Matériau du calque (ex: shader X-ray), s'il existe — décliné en
+    // variante "instanced" pour gérer THREE.InstancedMesh.
+    const layerMaterial = layerNode?.getMaterial?.();
+    const instancedMaterial =
+      layerMaterial && RenderXray.buildMaterial({ instanced: true });
 
     const url = ATON.PATH_COLLECTION + group.url;
     new THREE.GLTFLoader().load(url, (gltf) => {
-      const mesh = _findFirstMesh(gltf.scene);
-      if (!mesh) return;
-
-      const instanced = new THREE.InstancedMesh(mesh.geometry, mesh.material, transforms.length);
-
-      const m = new THREE.Matrix4();
-      transforms.forEach((t, i) => {
-        _composeMatrix(m, t);
-        instanced.setMatrixAt(i, m);
-      });
-      instanced.instanceMatrix.needsUpdate = true;
+      const meshes = _findAllMeshes(gltf.scene);
+      if (meshes.length === 0) return;
 
       const root = new THREE.Group();
-      root.add(instanced);
-      _applyTransform(root, group.rootTransform);
 
-      ATON.getRootScene().add(root);
+      meshes.forEach((mesh) => {
+        mesh.updateWorldMatrix(true, false);
+        const localMatrix = mesh.matrixWorld;
+
+        const material = instancedMaterial || mesh.material;
+        const instanced = new THREE.InstancedMesh(
+          mesh.geometry,
+          material,
+          transforms.length
+        );
+
+        const m = new THREE.Matrix4();
+        transforms.forEach((t, i) => {
+          _composeMatrix(m, t);
+          m.multiply(localMatrix);
+          instanced.setMatrixAt(i, m);
+        });
+        instanced.instanceMatrix.needsUpdate = true;
+
+        root.add(instanced);
+      });
+
+      _applyTransform(root, group.rootTransform);
+      target.add(root);
     });
   }
 
@@ -73,13 +105,10 @@ const RenderInstances = (() => {
 
   // ── Utilitaires ─────────────────────────────────────────────────────────
 
-  function _findFirstMesh(obj) {
-    if (obj.isMesh) return obj;
-    for (const child of obj.children) {
-      const found = _findFirstMesh(child);
-      if (found) return found;
-    }
-    return null;
+  function _findAllMeshes(obj, out = []) {
+    if (obj.isMesh) out.push(obj);
+    for (const child of obj.children) _findAllMeshes(child, out);
+    return out;
   }
 
   function _composeMatrix(m, t) {
