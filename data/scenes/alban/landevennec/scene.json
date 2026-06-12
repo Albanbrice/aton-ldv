@@ -13,20 +13,29 @@
         "transform": { "scale": [1, 1, 1], "rotation": [-1.57079632679, 0, 0] }
       },
       "restitution-XIIIe-transparence": {
-        "urls": ["alban/models/abbaye_001.glb", "alban/models/abbaye_005.glb"],
+        "urls": [
+          "alban/models/abbaye_001.glb",
+          "alban/models/abbaye_005.glb",
+          "alban/models/cloitre.glb"
+        ],
         "show": false
       },
       "restitution-XIIIe": {
         "urls": ["alban/models/abbaye_001.glb"],
         "show": false
       },
-      "archives-photo": { "urls": [], "show": false }
+      "archives-photo": { "urls": [], "show": false },
+      "fragments": {
+        "urls": ["alban/models/HS39.glb", "alban/models/HS26.glb"],
+        "show": false
+      }
     },
     "edges": {
       ".": [
         "etat-actuel",
         "restitution-XIIIe-transparence",
-        "restitution-XIIIe"
+        "restitution-XIIIe",
+        "fragments"
       ]
     }
   },
