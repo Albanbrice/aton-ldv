@@ -26,7 +26,18 @@
       },
       "archives-photo": { "urls": [], "show": false },
       "fragments": {
-        "urls": ["alban/models/HS39.glb", "alban/models/HS26.glb"],
+        "urls": [
+          "alban/models/HS39.glb",
+          "alban/models/HS26.glb",
+          "alban/models/2032.glb",
+          "alban/models/C21bis.glb",
+          "alban/models/C22PQ23.glb",
+          "alban/models/HS17.glb",
+          "alban/models/HS18.glb",
+          "alban/models/HS38.glb",
+          "alban/models/M18-chapiteau-D.glb",
+          "alban/models/M18-chapiteau-G.glb"
+        ],
         "show": false
       }
     },
