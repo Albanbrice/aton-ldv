@@ -61,6 +61,7 @@ const XRModule = (() => {
 
   function _onXRStart() {
     document.getElementById("ui-overlay")?.classList.add("xr-active");
+    RenderShadows.setEnabled(false); // shadow mapping coûteux en VR stéréo
     ATON.Nav.setUserControl(_bTeleportEnabled);
     // Oriente le rig vers la cible du POV courant : sans cela, le rig
     // démarre avec une rotation nulle et le visiteur regarde toujours
@@ -87,6 +88,7 @@ const XRModule = (() => {
 
   function _onXRExit() {
     document.getElementById("ui-overlay")?.classList.remove("xr-active");
+    RenderShadows.setEnabled(true);
     ATON.Nav.setUserControl(true);
     _prevLX = null;
     _pendingAlign = null;

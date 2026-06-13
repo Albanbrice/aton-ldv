@@ -32,7 +32,30 @@ const RenderInstances = (() => {
       transformsUrl: "json/instances-cloitre-chapiteau_quadruple.json",
       layer: "restitution-XIIIe-transparence",
     },
+    {
+      url: "alban/models/chapiteau_double.glb",
+      transformsUrl: "json/instances-cloitre-galeries.json",
+      layer: "restitution-XIIIe",
+    },
+    {
+      url: "alban/models/chapiteau_quadruple.glb",
+      transformsUrl: "json/instances-cloitre-chapiteau_quadruple.json",
+      layer: "restitution-XIIIe",
+    },
   ];
+
+  // Constructeur de matériau "instanced" par calque — chaque calque applique
+  // son propre rendu (cf. render-xray.js / render-clay.js) ; les instances
+  // (chapiteaux), montées séparément du modèle principal, doivent recevoir le
+  // même matériau pour rester cohérentes visuellement.
+  const LAYER_MATERIAL_BUILDERS = {
+    "restitution-XIIIe-transparence": () => RenderXray.buildMaterial({ instanced: true }),
+    // MeshStandardMaterial (clay) gère l'instancing nativement, pas besoin de
+    // variante de shader dédiée. RenderClay.buildMaterial() peut être appelé
+    // avant que l'environnement (IBL) soit chargé : le matériau est mis à jour
+    // rétroactivement dès que celui-ci est prêt.
+    "restitution-XIIIe": () => RenderClay.buildMaterial(),
+  };
 
   let _bInitialized = false;
 
@@ -57,11 +80,10 @@ const RenderInstances = (() => {
     const layerNode = group.layer && ATON.getSceneNode(group.layer);
     const target = layerNode || ATON.getRootScene();
 
-    // Matériau du calque (ex: shader X-ray), s'il existe — décliné en
-    // variante "instanced" pour gérer THREE.InstancedMesh.
-    const layerMaterial = layerNode?.getMaterial?.();
-    const instancedMaterial =
-      layerMaterial && RenderXray.buildMaterial({ instanced: true });
+    // Matériau du calque (ex: shader X-ray, clay), décliné pour gérer
+    // THREE.InstancedMesh.
+    const materialBuilder = group.layer && LAYER_MATERIAL_BUILDERS[group.layer];
+    const instancedMaterial = materialBuilder?.();
 
     const url = ATON.PATH_COLLECTION + group.url;
     new THREE.GLTFLoader().load(url, (gltf) => {
@@ -88,6 +110,8 @@ const RenderInstances = (() => {
           instanced.setMatrixAt(i, m);
         });
         instanced.instanceMatrix.needsUpdate = true;
+
+        if (RenderShadows.isShadowLayer(group.layer)) RenderShadows.flagShadowMesh(instanced);
 
         root.add(instanced);
       });

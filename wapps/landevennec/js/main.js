@@ -23,6 +23,8 @@ APP.setup = () => {
   Annotations.init();
   XRModule.init();
   RenderXray.init();
+  RenderClay.init();
+  RenderShadows.init();
   RenderInstances.init();
   Help.init(Help.VISITOR_SECTIONS);
 

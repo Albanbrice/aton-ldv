@@ -23,7 +23,13 @@
         "show": false
       },
       "restitution-XIIIe": {
-        "urls": ["alban/models/abbaye_001.glb"],
+        "urls": [
+          "alban/models/eglise.glb",
+          "alban/models/cloitre.glb",
+          "alban/models/chatelet.glb",
+          "alban/models/MNT.glb",
+          "alban/models/rempart.glb"
+        ],
         "show": false
       },
       "archives-photo": { "urls": [], "show": false },

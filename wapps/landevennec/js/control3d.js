@@ -20,6 +20,8 @@ APP.setup = () => {
     Annotations.init();
     XRModule.init();
     RenderXray.init();
+    RenderClay.init();
+    RenderShadows.init();
     RenderInstances.init();
 
     // Le médiateur navigue toujours librement et conserve sa rotation snap entre téléportations
