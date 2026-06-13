@@ -14,6 +14,13 @@ const XRModule = (() => {
   const CEILING_HEIGHT = 30; // m au-dessus du sol — plafond maximal pour éviter de perdre les visiteurs
   // Nœuds terrain par ordre de priorité — le premier visible sert de référence
   const TERRAIN_NODES = ["etat-actuel", "restitution-XIIIe"];
+  // Densité du framebuffer XR. ATON applique par défaut un facteur 0.5 sur
+  // mobile/Quest (ATON.XR.LOW_DENSITY_F), donc 2.0 revient à une résolution
+  // native ×1. 3.0 = supersampling ×1.5 par rapport au natif — le renderer
+  // ATON est créé avec antialias:false (core, hors périmètre wapp), donc cette
+  // sur-résolution fait aussi office d'anti-aliasing. À réduire si le
+  // framerate Quest 3 chute (1.5 = natif×0.75, 2.0 = natif×1).
+  const XR_DENSITY = 3.0;
 
   // ── État interne ──────────────────────────────────────────────────────────
 
@@ -61,6 +68,7 @@ const XRModule = (() => {
 
   function _onXRStart() {
     document.getElementById("ui-overlay")?.classList.add("xr-active");
+    ATON.XR.setDensity(XR_DENSITY);
     RenderShadows.setEnabled(false); // shadow mapping coûteux en VR stéréo
     ATON.Nav.setUserControl(_bTeleportEnabled);
     // Oriente le rig vers la cible du POV courant : sans cela, le rig
@@ -88,6 +96,7 @@ const XRModule = (() => {
 
   function _onXRExit() {
     document.getElementById("ui-overlay")?.classList.remove("xr-active");
+    ATON.XR.setDensity(1.0);
     RenderShadows.setEnabled(true);
     ATON.Nav.setUserControl(true);
     _prevLX = null;

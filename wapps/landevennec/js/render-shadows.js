@@ -15,7 +15,7 @@ const RenderShadows = (() => {
   const LIGHT_DIRECTION = new THREE.Vector3(0.4, -1.0, 0.3);
   const LIGHT_INTENSITY = 1.0;
 
-  const SHADOW_MAP_SIZE = 2048;
+  const SHADOW_MAP_SIZE = 4096;
   const SHADOW_BIAS = -0.0005;
   const DEFAULT_RADIUS = 60.0; // fallback (m) si ATON.bounds n'est pas encore calculé
 
