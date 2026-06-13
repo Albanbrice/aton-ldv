@@ -16,7 +16,10 @@
         "urls": [
           "alban/models/abbaye_001.glb",
           "alban/models/abbaye_005.glb",
-          "alban/models/cloitre.glb"
+          "alban/models/cloitre.glb",
+          "alban/models/chatelet.glb",
+          "alban/models/MNT.glb",
+          "alban/models/rempart.glb"
         ],
         "show": false
       },
